@@ -44,7 +44,6 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
@@ -54,7 +53,7 @@ $config = [
     ],
     'params' => $params,
 ];
-
+$config['components'] = array_merge($config['components'],$db);
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
 //    $config['bootstrap'][] = 'debug';

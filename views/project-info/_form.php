@@ -16,9 +16,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'project_key')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'create_time')->textInput() ?>
+    <?php // echo $form->field($model, 'create_time')->textInput() ?>
 
-    <?= $form->field($model, 'update_time')->textInput() ?>
+    <?php //echo  $form->field($model, 'update_time')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

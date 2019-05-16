@@ -15,6 +15,11 @@ use Yii;
  */
 class ProjectInfo extends \yii\db\ActiveRecord
 {
+    public static function getDb()
+    {
+        return Yii::$app->db2;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -43,11 +48,11 @@ class ProjectInfo extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'project_name' => 'Project Name',
-            'project_key' => 'Project Key',
-            'create_time' => 'Create Time',
-            'update_time' => 'Update Time',
+            'id'           => 'ID',
+            'project_name' => '项目的名称',
+            'project_key'  => '项目的key',
+            'create_time'  => '创建时间',
+            'update_time'  => '更新时间',
         ];
     }
 }
