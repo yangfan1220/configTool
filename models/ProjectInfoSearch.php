@@ -17,8 +17,8 @@ class ProjectInfoSearch extends ProjectInfo
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['project_name', 'project_key', 'create_time', 'update_time'], 'safe'],
+            [['id', 'redis_port', 'redis_database_id'], 'integer'],
+            [['project_name', 'project_key', 'redis_host', 'redis_password', 'create_time', 'update_time'], 'safe'],
         ];
     }
 
@@ -59,12 +59,16 @@ class ProjectInfoSearch extends ProjectInfo
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'redis_port' => $this->redis_port,
+            'redis_database_id' => $this->redis_database_id,
             'create_time' => $this->create_time,
             'update_time' => $this->update_time,
         ]);
 
         $query->andFilterWhere(['like', 'project_name', $this->project_name])
-            ->andFilterWhere(['like', 'project_key', $this->project_key]);
+            ->andFilterWhere(['like', 'project_key', $this->project_key])
+            ->andFilterWhere(['like', 'redis_host', $this->redis_host])
+            ->andFilterWhere(['like', 'redis_password', $this->redis_password]);
 
         return $dataProvider;
     }

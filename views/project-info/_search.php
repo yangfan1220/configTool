@@ -13,9 +13,6 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
-        'options' => [
-            'data-pjax' => 1
-        ],
     ]); ?>
 
     <?= $form->field($model, 'id') ?>
@@ -24,9 +21,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'project_key') ?>
 
-    <?= $form->field($model, 'create_time') ?>
+    <?= $form->field($model, 'redis_host') ?>
 
-    <?= $form->field($model, 'update_time') ?>
+    <?= $form->field($model, 'redis_port') ?>
+
+    <?php // echo $form->field($model, 'redis_database_id') ?>
+
+    <?php // echo $form->field($model, 'redis_password') ?>
+
+    <?php // echo $form->field($model, 'create_time') ?>
+
+    <?php // echo $form->field($model, 'update_time') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

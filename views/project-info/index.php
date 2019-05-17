@@ -2,12 +2,12 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-use yii\widgets\Pjax;
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ProjectInfoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '配置项目信息';
+$this->title = 'Project Infos';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="project-info-index">
@@ -15,20 +15,24 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('创建配置的项目', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Project Info', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php Pjax::begin(); ?>
-<!--    --><?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
+
             'id',
             'project_name',
             'project_key',
+            'redis_host',
+            'redis_port',
+            'redis_database_id',
+            'redis_password',
             'create_time',
             'update_time',
 
@@ -36,6 +40,5 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?php Pjax::end(); ?>
 
 </div>

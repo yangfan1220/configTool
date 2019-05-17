@@ -16,9 +16,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'project_key')->textInput(['maxlength' => true]) ?>
 
-    <?php // echo $form->field($model, 'create_time')->textInput() ?>
+    <?= $form->field($model, 'redis_host')->textInput(['maxlength' => true]) ?>
 
-    <?php //echo  $form->field($model, 'update_time')->textInput() ?>
+    <?= $form->field($model, 'redis_port')->textInput() ?>
+
+    <?= $form->field($model, 'redis_database_id')->textInput() ?>
+
+    <?= $form->field($model, 'redis_password')->textInput(['maxlength' => true]) ?>
+
+<!--    --><?php //= $form->field($model, 'create_time')->textInput() ?>
+<!---->
+<!--    --><?php //= $form->field($model, 'update_time')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
