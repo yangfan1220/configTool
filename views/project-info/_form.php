@@ -29,7 +29,9 @@ use yii\widgets\ActiveForm;
 <!--    --><?php //= $form->field($model, 'update_time')->textInput() ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success','data' => [
+            'confirm' => 'Do you confirm?',
+        ]]) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

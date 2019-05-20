@@ -114,7 +114,7 @@ class Column extends BaseObject
 
     private  function contact($willContactData,$model){
         if(!empty($this->attribute) && get_class($model)=='app\models\ProjectInfo' && $this->attribute=='project_key'){
-            $willContactData='<a href=\'/project-info/aaa\'>'.$willContactData.'</a>';
+            return Html::a($willContactData, ['project-info/first?projectKey='.$willContactData], ['class' => 'btn btn-info','data-toggle'=>'modal','data-target'=>'#projectKey']);
         }
         return $willContactData;
     }

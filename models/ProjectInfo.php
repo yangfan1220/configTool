@@ -28,15 +28,6 @@ class ProjectInfo extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return object|\yii\db\Connection|null
-     * @throws \yii\base\InvalidConfigException
-     */
-    public static function getDb()
-    {
-        return Yii::$app->get('db2');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function rules()

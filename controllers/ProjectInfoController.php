@@ -2,12 +2,15 @@
 
 namespace app\controllers;
 
+use app\models\FormatDataStruct;
+use app\models\TableConfirm;
 use Yii;
 use app\models\ProjectInfo;
 use app\models\ProjectInfoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * ProjectInfoController implements the CRUD actions for ProjectInfo model.
@@ -21,7 +24,7 @@ class ProjectInfoController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -38,8 +41,12 @@ class ProjectInfoController extends Controller
         $searchModel = new ProjectInfoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+//        var_dump($_GET);
+//        $tableIsExistRe=TableConfirm::tableIsExist($projectKey);
+//        if (!empty($tableIsExistRe)) echo $tableIsExistRe;
+
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -123,5 +130,32 @@ class ProjectInfoController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionFirst($projectKey)
+    {
+        $this->layout = false;
+        $tableIsExistRe = TableConfirm::tableIsExist($projectKey);
+        return $this->render('first', [
+            'tableIsExistRe' => $tableIsExistRe,
+            'createTableDDL' => sprintf(Yii::$app->params['createConfigDataStorageTableDDL'], TableConfirm::willCreateTableName($projectKey)),
+            'projectKey'     => $projectKey,
+        ]);
+    }
+
+    public function actionCreateTable()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $this->layout = false;
+        $projectKey = Yii::$app->request->post('projectKey');
+        if (TableConfirm::tableIsExist($projectKey)) {
+            $this->redirect('/project-info/index');
+        }
+        $createTableRe = TableConfirm::createTable($projectKey);
+        if ($createTableRe === 0) {
+            return FormatDataStruct::success($createTableRe);
+        } else {
+            return FormatDataStruct::failed($createTableRe);
+        }
     }
 }

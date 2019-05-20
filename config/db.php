@@ -15,7 +15,7 @@ return [
     ],
     'db2'=>[
         'class' => 'yii\db\Connection',
-        'dsn' => 'mysql:host=localhost;dbname=config_tool_storage',
+        'dsn' => 'mysql:host=localhost;dbname=config_data_storage',
         'username' => 'root',
         'password' => 'root',
         'charset' => 'utf8',
