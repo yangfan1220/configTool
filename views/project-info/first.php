@@ -8,13 +8,15 @@
 
 use yii\helpers\Html;
 
-if ($tableIsExistRe == false) {
-    ?>
+?>
     <script src="/assets/80ce0cea/jquery.js"></script>
     <script src="/assets/b37ae8fb/yii.js"></script>
     <script src="/assets/b37ae8fb/yii.gridView.js"></script>
     <script src="/assets/beb28805/js/bootstrap.js"></script>
     <div style="display: none" class="willSendProjectKey"><?=$projectKey ?></div>
+<?php
+if ($tableIsExistRe == false) {
+    ?>
     <div class="alert alert-warning alert-dismissible" role="alert">
         <strong>警告！</strong> 当前项目的配置表不存在，是否确认创建？
     </div>
@@ -29,17 +31,17 @@ if ($tableIsExistRe == false) {
     </div>
     <script type="text/javascript">
         $(function () {
+            var willSendProjectKey=$('.willSendProjectKey').text();
             $(".submitTableDDL").click(function () {
                 $.ajax({
                     url: '/project-info/create-table',
                     data: {
-                        projectKey: $('.willSendProjectKey').text(),
+                        projectKey: willSendProjectKey,
                     },
                     type: 'POST',
                     success: function (data) {
-                        console.log(data);
                         if (data.code==0){
-                            window.location.href="/project-info/index";
+                            window.location.href="/common-config-data/index?pk="+willSendProjectKey;
                             //TODO  跳转配置详情页面
                         }else {
                             alert('创建失败');
@@ -56,6 +58,11 @@ if ($tableIsExistRe == false) {
     </script>
     <?php
 } else {
-    //TODO 跳转项目配置信息的所有配置列表
+    ?>
+    <script type="text/javascript">
+        var willSendProjectKey=$('.willSendProjectKey').text();
+        window.location.href="/common-config-data/index?pk="+willSendProjectKey;
+    </script>
+<?php
 }
 ?>

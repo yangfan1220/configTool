@@ -27,6 +27,11 @@ class TableConfirm extends \yii\db\ActiveRecord
         return empty($commandRe) ? false : true;
     }
 
+    /**
+     * 修改表名生成规则可以修改这里
+     * @param $projectKey
+     * @return string
+     */
     public static function willCreateTableName($projectKey)
     {
         $tableSuffix = \Yii::$app->params['table_suffix'];

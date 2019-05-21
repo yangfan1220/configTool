@@ -25,7 +25,6 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
     ],
     'params' => $params,
     /*
@@ -36,6 +35,7 @@ $config = [
     ],
     */
 ];
+$config['components'] = array_merge($config['components'],$db);
 
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment

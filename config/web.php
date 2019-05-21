@@ -28,14 +28,6 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'redis' => [
-            'class' => 'yii\redis\Connection',
-/*********************************设置为空的原因在于需要根据配置动态的设置redis连接**********************************************************/
-            'hostname' => 'localhost',
-            'port' => 6379,
-            'database' => 0,
-            'password'=>'foobared'
-        ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             // send all mails to a file by default. You have to set
