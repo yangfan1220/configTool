@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\TableConfirm;
+use app\models\UpdateValue;
 use Yii;
 use app\models\CommonConfigData;
 use app\models\CommonConfigDataSearch;
@@ -20,7 +21,7 @@ class CommonConfigDataController extends Controller
         $queryParams = Yii::$app->request->queryParams;
         if (isset($queryParams['pk']) && !empty($queryParams['pk'])) {
             CommonConfigData::setTableName($queryParams['pk']);
-            Yii::$app->session['pk']=$queryParams['pk'];
+            Yii::$app->session['pk'] = $queryParams['pk'];
             //判断是否存在该表
             static::tableIsExist($queryParams['pk']);
             return;
@@ -31,14 +32,14 @@ class CommonConfigDataController extends Controller
             static::tableIsExist(Yii::$app->session['pk']);
             return;
         }
-        if (empty($queryParams['pk']) && Yii::$app->session->has('pk')===false){
+        if (empty($queryParams['pk']) && Yii::$app->session->has('pk') === false) {
             throw new NotFoundHttpException('会话过期，请回到主页重新登录');
         }
     }
 
     private static function tableIsExist($projectkey)
     {
-        if(TableConfirm::tableIsExist($projectkey)===false){
+        if (TableConfirm::tableIsExist($projectkey) === false) {
             throw new NotFoundHttpException('该表不存在，请不要修改url地址');
         }
     }
@@ -95,7 +96,7 @@ class CommonConfigDataController extends Controller
     {
         $model = new CommonConfigData();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save() && UpdateValue::setRedisValue(Yii::$app->request->post())) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -115,7 +116,8 @@ class CommonConfigDataController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save() && UpdateValue::setRedisValue(Yii::$app->request->post())) {
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -125,15 +127,17 @@ class CommonConfigDataController extends Controller
     }
 
     /**
-     * Deletes an existing CommonConfigData model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $commonConfigDataModel = $this->findModel($id);
+        $commonConfigDataModel->delete();
+        UpdateValue::delRedisValue($commonConfigDataModel->getAttribute('key'));
 
         return $this->redirect(['index']);
     }

@@ -86,15 +86,25 @@ class SetValue
         }
     }
 
-    public static function setRedisValue($data,$projectKey)
+    public static function setRedisValue($data, $projectKey)
     {
         foreach ($data as $key => $value) {
-
-            $setRe=self::$redisConnection->set($projectKey.'_set_'.$key, $value);
-            if ($setRe==false){
+            $setRe = self::$redisConnection->set(static::getKeysRule($projectKey, $key), $value);
+            if ($setRe == false) {
                 //TODO 失败日志、邮件、等等通知
             }
             //TODO 成功日志、邮件、等等通知
         }
+    }
+
+    /**
+     * 未来修改设置key的规则 在这里修改
+     * @param $projectKey
+     * @param $key
+     * @return string
+     */
+    public static function getKeysRule($projectKey, $key)
+    {
+        return $projectKey . '_set_' . $key;
     }
 }
