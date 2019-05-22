@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\CommonConfigDataSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Common Config Datas';
+$this->title = '项目配置数据';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="common-config-data-index">
@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Common Config Data', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('添加配置', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php Pjax::begin(); ?>

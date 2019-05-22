@@ -45,6 +45,7 @@ class CommonConfigData extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['key'], 'match', 'pattern' => '/^[a-zA-Z0-9]{1,}$/'],
             [['key', 'value', 'comment'], 'required'],
             [['value'], 'string'],
             [['create_time', 'update_time'], 'safe'],

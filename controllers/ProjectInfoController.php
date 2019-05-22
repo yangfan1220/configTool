@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\FormatDataStruct;
+use app\models\SetValue;
 use app\models\TableConfirm;
 use Yii;
 use app\models\ProjectInfo;
@@ -72,9 +73,16 @@ class ProjectInfoController extends Controller
     public function actionCreate()
     {
         $model = new ProjectInfo();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                SetValue::setConfDataRedisInfo(Yii::$app->request->post('ProjectInfo'));
+                SetValue::testConnect();
+            } catch (\Exception $e) {
+                throw new NotFoundHttpException($e->getMessage());
+            }
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('create', [
@@ -151,10 +159,10 @@ class ProjectInfoController extends Controller
         if (TableConfirm::tableIsExist($projectKey)) {
             $this->redirect('/project-info/index');
         }
-        try{
+        try {
             $createTableRe = TableConfirm::createTable($projectKey);
-        }catch (\Exception $e){
-            $createTableRe=$e->getMessage();
+        } catch (\Exception $e) {
+            $createTableRe = $e->getMessage();
         }
         if ($createTableRe === 0) {
             return FormatDataStruct::success($createTableRe);

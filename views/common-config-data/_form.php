@@ -22,7 +22,7 @@ use yii\widgets\ActiveForm;
 <!--    --><?php // echo $form->field($model, 'update_time')->textInput() ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('保存', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
