@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\ProjectInfoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Project Infos';
+$this->title = '项目信息';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="project-info-index">
@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Project Info', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('创建项目', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <!--    --><?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -26,7 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel'  => $searchModel,
         'columns'      => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             'project_name',
             'project_key',

@@ -5,6 +5,8 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'sourceLanguage' => 'en-US',
+    'language' => 'zh-CN',
     'name'=>'配置工具',
     'basePath' => dirname(__DIR__),
     'defaultRoute'=>'project-info/index',
@@ -27,6 +29,7 @@ $config = [
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
+//            'class' => 'app\components\ExceptionHandler'
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -50,6 +53,19 @@ $config = [
             'rules' => [
             ],
         ],
+//        'response' => [
+//            'class' => 'yii\web\Response',
+//            'on beforeSend' => function ($event) {
+//                $response = $event->sender;
+//                if ($response->data !== null) {
+//                    $response->data = [
+//                        'success' => $response->isSuccessful,
+//                        'data' => $response->data,
+//                    ];
+//                    $response->statusCode = 200;
+//                }
+//            },
+//        ],
     ],
     'params' => $params,
 ];

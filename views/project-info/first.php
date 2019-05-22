@@ -17,6 +17,7 @@ use yii\helpers\Html;
 <?php
 if ($tableIsExistRe == false) {
     ?>
+
     <div class="alert alert-warning alert-dismissible" role="alert">
         <strong>警告！</strong> 当前项目的配置表不存在，是否确认创建？
     </div>
@@ -42,10 +43,8 @@ if ($tableIsExistRe == false) {
                     success: function (data) {
                         if (data.code==0){
                             window.location.href="/common-config-data/index?pk="+willSendProjectKey;
-                            //TODO  跳转配置详情页面
                         }else {
-                            alert('创建失败');
-                            //TODO  设计一个公共弹框方法
+                            alert("创建失败"+data.msg);
                         }
                     },
                     error: function (err) {

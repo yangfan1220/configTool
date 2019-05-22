@@ -151,7 +151,11 @@ class ProjectInfoController extends Controller
         if (TableConfirm::tableIsExist($projectKey)) {
             $this->redirect('/project-info/index');
         }
-        $createTableRe = TableConfirm::createTable($projectKey);
+        try{
+            $createTableRe = TableConfirm::createTable($projectKey);
+        }catch (\Exception $e){
+            $createTableRe=$e->getMessage();
+        }
         if ($createTableRe === 0) {
             return FormatDataStruct::success($createTableRe);
         } else {

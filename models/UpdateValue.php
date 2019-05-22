@@ -18,7 +18,7 @@ class UpdateValue
     public static function setRedisValue($postParams)
     {
         static::testConnection($postParams['CommonConfigData']['key']);
-        $setRe = SetValue::$redisConnection->set(static::$willSetRedisKey, $postParams['CommonConfigData']['value']);
+        $setRe = SetValue::$redisConnection->set(static::$willSetRedisKey, $postParams['CommonConfigData']['value'],'ex','3600');
         if ($setRe == false) {
             //TODO 失败日志、邮件、等等通知
             return false;

@@ -59,7 +59,6 @@ class SetValue
 
     public static function getConfDataByProjectKey($projectKey)
     {
-        //TODO 在考虑是否加上验证表名是否存在  暂时不加
         CommonConfigData::setTableName($projectKey);
         $confData = CommonConfigData::find()->asArray()->all();
         return array_column($confData, 'value', 'key');
@@ -89,7 +88,7 @@ class SetValue
     public static function setRedisValue($data, $projectKey)
     {
         foreach ($data as $key => $value) {
-            $setRe = self::$redisConnection->set(static::getKeysRule($projectKey, $key), $value);
+            $setRe = self::$redisConnection->set(static::getKeysRule($projectKey, $key), $value,'ex','3600');
             if ($setRe == false) {
                 //TODO 失败日志、邮件、等等通知
             }

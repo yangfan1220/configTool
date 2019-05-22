@@ -34,11 +34,13 @@ class ProjectInfo extends \yii\db\ActiveRecord
     {
         return [
             [['project_name', 'project_key', 'redis_host'], 'required'],
+            [['project_name', 'project_key', 'redis_host','redis_port','redis_database_id','redis_password'], 'trim'],
             [['redis_port', 'redis_database_id'], 'integer'],
             [['create_time', 'update_time'], 'safe'],
             [['project_name', 'project_key', 'redis_host', 'redis_password'], 'string', 'max' => 50],
             [['project_name'], 'unique'],
             [['project_key'], 'unique'],
+            [['project_key'],'match','pattern' => '/^[0-9a-zA-Z_]{1,}$/'],
         ];
     }
 
@@ -50,7 +52,7 @@ class ProjectInfo extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'project_name' => '项目名称',
-            'project_key' => '项目唯一key：用于业务端获取配置信息',
+            'project_key' => '项目唯一key：支持英文数字下划线',
             'redis_host' => 'redis主机地址',
             'redis_port' => 'redis主机端口',
             'redis_database_id' => 'redis数据库',

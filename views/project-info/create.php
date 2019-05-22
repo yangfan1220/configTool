@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\ProjectInfo */
 
-$this->title = 'Create Project Info';
-$this->params['breadcrumbs'][] = ['label' => 'Project Infos', 'url' => ['index']];
+$this->title = '创建项目';
+$this->params['breadcrumbs'][] = ['label' => '项目信息', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="project-info-create">
