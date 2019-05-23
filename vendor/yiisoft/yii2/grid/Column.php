@@ -108,15 +108,7 @@ class Column extends BaseObject
             $options = $this->contentOptions;
         }
 
-        $data=$this->contact($this->renderDataCellContent($model, $key, $index),$model);
-        return Html::tag('td', $data, $options);
-    }
-
-    private  function contact($willContactData,$model){
-        if(!empty($this->attribute) && get_class($model)=='app\models\ProjectInfo' && $this->attribute=='project_key'){
-            return Html::a($willContactData, ['project-info/first?projectKey='.$willContactData], ['class' => 'btn btn-info','data-toggle'=>'modal','data-target'=>'#projectKey']);
-        }
-        return $willContactData;
+        return Html::tag('td', $this->renderDataCellContent($model, $key, $index), $options);
     }
 
     /**

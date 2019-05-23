@@ -113,7 +113,7 @@ class UniqueValidator extends Validator
                 $this->message = $this->comboNotUnique;
             }
         } else {
-            $this->message = Yii::t('yii', '{attribute} "{value}" 已经存在.');
+            $this->message = Yii::t('yii', '{attribute} "{value}" has already been taken.');
         }
     }
 

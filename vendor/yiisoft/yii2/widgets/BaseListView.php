@@ -118,7 +118,7 @@ abstract class BaseListView extends Widget
             throw new InvalidConfigException('The "dataProvider" property must be set.');
         }
         if ($this->emptyText === null) {
-            $this->emptyText = Yii::t('yii', '数据集为空');
+            $this->emptyText = Yii::t('yii', 'No results found.');
         }
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->getId();

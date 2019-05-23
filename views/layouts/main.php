@@ -24,6 +24,8 @@ AppAsset::register($this);
         background-size: 100% 100%;
         background-repeat: no-repeat;
     }
+
+
 </style>
 <html lang="<?= Yii::$app->language ?>">
 <head>
@@ -35,6 +37,7 @@ AppAsset::register($this);
     <?php $this->head() ?>
 </head>
 <body>
+
 <?php $this->beginBody() ?>
 
 <div class="wrap">
