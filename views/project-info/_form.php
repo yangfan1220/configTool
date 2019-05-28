@@ -2,31 +2,24 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\models\common\GetUserModel;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ProjectInfo */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="project-info-form">
+<div class="project-info-form" style="width: 40%;margin-left:25%">
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'project_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'app_id')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'project_key')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'app_name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'redis_host')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'app_principal_id')->dropDownList(GetUserModel::getAppPrincipalInfo(), ['prompt'=>'请选择']) ?>
 
-    <?= $form->field($model, 'redis_port')->textInput() ?>
-
-    <?= $form->field($model, 'redis_database_id')->textInput() ?>
-
-    <?= $form->field($model, 'redis_password')->textInput(['maxlength' => true]) ?>
-
-<!--    --><?php //= $form->field($model, 'create_time')->textInput() ?>
-<!---->
-<!--    --><?php //= $form->field($model, 'update_time')->textInput() ?>
+    <?php echo $form->field($model, 'project_administrator_id_json')->dropDownList(GetUserModel::getAppPrincipalInfo(),['prompt'=>'请选择']) ?>
 
     <div class="form-group">
         <?= Html::submitButton('保存', ['class' => 'btn btn-success','data' => [

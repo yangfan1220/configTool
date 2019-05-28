@@ -15,15 +15,15 @@ AppAsset::register($this);
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <style>
-    html,body{
-        width:100%;
-        height:100%
-    }
-    body {background-image: URL(<?=\yii\helpers\Url::to('@web/assets/custom/gratisography-waves-crashing-rocks.jpg', true) ?>);
-        background-position: top left;
-        background-size: 100% 100%;
-        background-repeat: no-repeat;
-    }
+    /*html,body{*/
+    /*    width:100%;*/
+    /*    height:100%*/
+    /*}*/
+    /*body {background-image: URL(*/<?//=\yii\helpers\Url::to('@web/assets/custom/gratisography-waves-crashing-rocks.jpg', true) ?>/*);*/
+    /*    background-position: top left;*/
+    /*    background-size: 100% 100%;*/
+    /*    background-repeat: no-repeat;*/
+    /*}*/
 
 
 </style>
@@ -36,7 +36,7 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
-<body>
+<body style="background-color:#f1f2f7">
 
 <?php $this->beginBody() ?>
 
@@ -49,33 +49,42 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-//    echo Nav::widget([
-//        'options' => ['class' => 'navbar-nav navbar-right'],
-//        'items' => [
-//            ['label' => 'Home', 'url' => ['/project-info/index']],
-//            ['label' => 'About', 'url' => ['/site/about']],
-//            ['label' => 'Contact', 'url' => ['/site/contact']],
-//            Yii::$app->user->isGuest ? (
-//                ['label' => 'Login', 'url' => ['/site/login']]
-//            ) : (
-//                '<li>'
-//                . Html::beginForm(['/site/logout'], 'post')
-//                . Html::submitButton(
-//                    'Logout (' . Yii::$app->user->identity->username . ')',
-//                    ['class' => 'btn btn-link logout']
-//                )
-//                . Html::endForm()
-//                . '</li>'
-//            )
-//        ],
-//    ]);
+     Html::beginForm('/a/a/a','post');
+     echo Html::input('select','aa','',[
+             'class'=>'form-control',
+             'placeholder'=>'搜索项目(AppId、项目名称)',
+             'style'=>'width:20%;display:inline;margin-top:0.5%;margin-left:30%;',
+     ]);
+
+     Html::endForm();
+
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav navbar-right'],
+        'items' => [
+            ['label' => 'Home', 'url' => ['/project-info/index']],
+            ['label' => 'About', 'url' => ['/site/about']],
+            ['label' => 'Contact', 'url' => ['/site/contact']],
+            Yii::$app->user->isGuest ? (
+                ['label' => 'Login', 'url' => ['/site/login']]
+            ) : (
+                '<li>'
+                . Html::beginForm(['/site/logout'], 'post')
+                . Html::submitButton(
+                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>'
+            )
+        ],
+    ]);
     NavBar::end();
     ?>
 
     <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
+<!--        --><?php //echo Breadcrumbs::widget([
+//            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+//        ]) ?>
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>

@@ -6,7 +6,7 @@ use app\models\FormatDataStruct;
 use app\models\SetValue;
 use app\models\TableConfirm;
 use Yii;
-use app\models\ProjectInfo;
+use app\models\tables\ProjectInfo;
 use app\models\ProjectInfoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -39,17 +39,14 @@ class ProjectInfoController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ProjectInfoSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+//        $searchModel = new ProjectInfoSearch();
+//        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+//
+////        var_dump($_GET);
+////        $tableIsExistRe=TableConfirm::tableIsExist($projectKey);
+////        if (!empty($tableIsExistRe)) echo $tableIsExistRe;
 
-//        var_dump($_GET);
-//        $tableIsExistRe=TableConfirm::tableIsExist($projectKey);
-//        if (!empty($tableIsExistRe)) echo $tableIsExistRe;
-
-        return $this->render('index', [
-            'searchModel'  => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        return $this->render('index');
     }
 
     /**
@@ -66,28 +63,16 @@ class ProjectInfoController extends Controller
     }
 
     /**
-     * Creates a new ProjectInfo model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * 创建项目基本信息
+     * @return string|Response
      */
     public function actionCreate()
     {
         $model = new ProjectInfo();
-        if ($model->load(Yii::$app->request->post())) {
-            try {
-                SetValue::setConfDataRedisInfo(Yii::$app->request->post('ProjectInfo'));
-                SetValue::testConnect();
-            } catch (\Exception $e) {
-                throw new NotFoundHttpException($e->getMessage());
-            }
-            if ($model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
+        if ($model->load(Yii::$app->request->post()) &&  $model->save()){
+            return $this->redirect(['/common-config-data/index', 'app_id' => $model->app_id]);
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return $this->render('create',['model'=>$model]);
     }
 
     /**

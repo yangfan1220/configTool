@@ -1,55 +1,69 @@
 <?php
 
-use yii\helpers\Html;
-use yii\grid\GridView;
-
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ProjectInfoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '项目信息';
-$this->params['breadcrumbs'][] = $this->title;
+$this->registerJs('$(function () {
+       var myProjectParentHeight=$(".myProject").parent().height();
+       if(myProjectParentHeight>400){
+           $(".myProject").css("height",myProjectParentHeight);
+       }
+       $(".myProjectChild").css("margin-top",myProjectParentHeight/2);
+       //获取项目信息
+       $.ajax({
+        url: \'/api/project-info/get-project-info\',
+        type: \'GET\',
+        success: function (data) {
+            if (data.code==0){
+                $.each(data.data,function (key,value) {
+                if(value.app_id!=undefined){
+                 $(".willPushItems").append(generateWillPushItem(value.app_id,value.app_name));
+                }
+                   
+                });
+            }else {
+                alert("获取项目信息失败"+data.msg);
+            }
+        },
+        error: function (err) {
+            alert("获取项目信息失败"+data.msg);
+        }
+    });
+    $(".createProject").click(function () {
+        window.location.href="/project-info/create";
+    });
+       });');
+$this->registerJs('
+       $(".willPushItems").on("click",".projectInfo",function(){
+        window.location.href="common-config-data/index?app_id="+$(this).attr("appId");
+  });
+');
 ?>
-<div class="project-info-index">
+<script type="text/javascript">
+    function generateWillPushItem(appId,appName) {
+        return "<div class=\"col-md-2 overview btn projectInfo\" appId=\""+appId+"\">"+appId+"<br/>"+appName+"</div>";
+    }
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('创建项目', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
-    <!--    --><?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <?php
-    echo GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel'  => $searchModel,
-        'columns'      => [
-            ['class' => 'yii\grid\SerialColumn'],
-            'id',
-            'project_name',
-            'project_key',
-            'redis_host',
-            'redis_port',
-            'redis_database_id',
-            'redis_password',
-            'create_time',
-            'update_time',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]);
-    ?>
-    <!--   用于显示弹出框的基本元素-->
-    <div class="modal bs-example-modal-lg" id="projectKey">
-        <div class="modal-dialog">
-            <div class="modal-content width_reset" id="tmpl-modal-output-render"></div>
+</script>
+<style rel="stylesheet">
+    .overview {
+        background-color: #a9d86c;
+        margin: 0.5% 0.5%;
+        color: #ffffff;
+        height: 117px;
+    }
+    .vertical_center{
+        padding-top: 10%;
+    }
+</style>
+<div class="row" style="text-align: center">
+    <div class="col-md-2 overview myProject vertical_center" style="height: 258px">我的项目</div>
+    <div class="row willPushItems">
+        <div class="col-md-2 overview btn createProject"><h1><span class="glyphicon  glyphicon-plus btn-lg" aria-hidden="true"></span>
+            </h1>创建项目
         </div>
+<!--js添加的元素在这里-->
     </div>
 
-    <!--    --><?php //\yii\widgets\Pjax::begin(['enablePushState' => false,'timeout' =>5000]); ?>
-    <!---->
-    <!--    --><?php //echo Html::a("历史地址", ['project-info/first?projectKey=11'], ['class' => 'btn btn-lg btn-primary']) ?>
-    <?php //if (!empty($tableIsExistRe)) echo $tableIsExistRe; ?>
-    <!--    --><?php //\yii\widgets\Pjax::end(); ?>
 </div>
