@@ -64,13 +64,13 @@ AppAsset::register($this);
             ['label' => 'Home', 'url' => ['/project-info/index']],
             ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
+            empty(Yii::$app->session['username']) ? (
+                ['label' => '登录', 'url' => ['/site/login']]
             ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
                 . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    '退出 (' . Yii::$app->session['username'] . ')',
                     ['class' => 'btn btn-link logout']
                 )
                 . Html::endForm()

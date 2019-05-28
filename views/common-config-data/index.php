@@ -87,4 +87,52 @@ $this->registerJs('$(function () {
 
     <?php Pjax::end(); ?>
 
+
+    <style type="text/css">
+        /**{*/
+            /*padding: 0;*/
+            /*margin: 0;*/
+        /*}*/
+        /*table{*/
+            /*margin: 100px auto;*/
+            /*border: 1px solid #000;*/
+            /*border-collapse: collapse;!*设置表格的边框是否被合并为一个单一的边框*!*/
+            /*border-spacing: 0;!*设置相邻单元格的边框间的距离*!*/
+        /*}*/
+        /*tr{*/
+            /*width: 300px;*/
+            /*height: 50px;*/
+            /*line-height: 50px;*/
+            /*border-bottom: 1px solid #000;*/
+            /*background-color: pink;*/
+        /*}*/
+        /*td,th{*/
+            /*width: 99px;*/
+            /*height: 50px;*/
+            /*line-height: 50px;*/
+            /*text-align: center;*/
+            /*border-right: 1px solid #000;*/
+        /*}*/
+        /*$.ajax({*/
+        /*url:'/common-config-data/a',*/
+        /*type:'get',*/
+        /*datatype:'json',*/
+        /*success:function(res){*/
+            /*console.log(res);*/
+        /*//将数据显示在页面上*/
+        /*var str = "";*/
+            /*str +="<table><thead><tr><th>姓名</th><th>年龄</th><th>住址</th></tr></thead><tbody>";*/
+        /*//遍历数据*/
+                /*$.each(res,function(index,element){*/
+            /*str +="<tr><td>"+element['name']+"</td><td>"+element['age']+"</td><td>"+element['address']+"</td></tr>";*/
+        /*})*/
+        /*//遍历完成之后*/
+          /*str +="</tbody></table>";*/
+        /*//将表格添加到body中*/
+                /*$('body').append(str);*/
+        /*}*/
+        /*})*/
+    </style>
+
+
 </div>

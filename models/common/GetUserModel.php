@@ -18,13 +18,13 @@ class GetUserModel
         $userInfos=UserInfo::find()->asArray()->all();
         $returnData=[];
         foreach ($userInfos as $key=>$userInfo){
-            $returnData[$userInfo['id']]=$userInfo['user_name'].' | '.$userInfo['user_mail'];
+            $returnData[$userInfo['user_id']]=$userInfo['user_name'].' | '.$userInfo['user_mail'];
         }
         return $returnData;
     }
 
     public static function getUserInfoByID($userID){
-        return UserInfo::find()->select(['id','user_name','user_mail'])->addParams(['id'=>$userID])->asArray()->one();
+        return UserInfo::find()->select(['user_id','user_name','user_mail'])->where(['user_id'=>$userID])->asArray()->one();
     }
 
     public static function getProjectInfoByAppId($appId){

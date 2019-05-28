@@ -10,6 +10,8 @@ use app\models\CommonConfigDataSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+
 
 /**
  * CommonConfigDataController implements the CRUD actions for CommonConfigData model.
@@ -18,6 +20,7 @@ class CommonConfigDataController extends Controller
 {
     public function init()
     {
+        Yii::$app->session['pk'] = 'test';
         $queryParams = Yii::$app->request->queryParams;
         if (isset($queryParams['pk']) && !empty($queryParams['pk'])) {
             CommonConfigData::setTableName($queryParams['pk']);
@@ -155,5 +158,26 @@ class CommonConfigDataController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionA(){
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $a='[{
+    "name":"baby",
+    "age":27,
+    "address":"china weifang"
+},
+{
+    "name":"黄晓明",
+    "age":30,
+    "address":"china yantai"
+},
+{
+    "name":"鹿晗",
+    "age":22,
+    "address":"china qingdao"
+}]';
+        return json_decode($a,true);
     }
 }

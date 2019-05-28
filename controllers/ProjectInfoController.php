@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\FormatDataStruct;
 use app\models\SetValue;
 use app\models\TableConfirm;
+use app\models\tables\JurisdictionInfo;
 use Yii;
 use app\models\tables\ProjectInfo;
 use app\models\ProjectInfoSearch;
@@ -18,6 +19,13 @@ use yii\web\Response;
  */
 class ProjectInfoController extends Controller
 {
+    public function init()
+    {
+        if(empty(Yii::$app->session['username'])){
+            $this->redirect('/site/login');
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -65,11 +73,32 @@ class ProjectInfoController extends Controller
     /**
      * 创建项目基本信息
      * @return string|Response
+     * @throws NotFoundHttpException
      */
     public function actionCreate()
     {
+        $data=Yii::$app->request->post();
         $model = new ProjectInfo();
-        if ($model->load(Yii::$app->request->post()) &&  $model->save()){
+        if ($model->load($data)){
+            $insertData=[];
+            foreach ($data['app_manage_ids'] as $userId){
+                $insertData[]=[
+                    $data['ProjectInfo']['app_id'],
+                    $userId
+                ];
+            }
+            $transaction=$model::getDb()->beginTransaction();
+            try{
+                if ($model->save() && $model::getDb()->createCommand()->batchInsert(JurisdictionInfo::tableName(), ['app_id','user_id'], $insertData)->execute()){
+                    $transaction->commit();
+                }else{
+                    $transaction->rollBack();
+                    throw new NotFoundHttpException('保存失败');
+                }
+            }catch (\Exception $e){
+                $transaction->rollBack();
+                throw new NotFoundHttpException($e);
+            }
             return $this->redirect(['/common-config-data/index', 'app_id' => $model->app_id]);
         }
         return $this->render('create',['model'=>$model]);
