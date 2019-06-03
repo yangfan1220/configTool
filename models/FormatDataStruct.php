@@ -23,7 +23,7 @@ class FormatDataStruct
     {
         $responseData = [
             'code' => (Int)$code,
-            'msg'  => (String)$msg,
+            'message'  => (String)$msg,
             'data' => (array)$data
         ];
         return $responseData;

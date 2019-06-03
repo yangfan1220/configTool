@@ -6,26 +6,26 @@
  * Time: 19:16
  */
 
-namespace app\models;
+namespace app\models\common;
 
 
-class TableConfirm extends \yii\db\ActiveRecord
+class TableConfirm
 {
-    /**
-     * @return object|null
-     * @throws \yii\base\InvalidConfigException
-     */
-    public static function getDb()
-    {
-        return \Yii::$app->get('db2');
-    }
-
-    public static function tableIsExist($projectKey)
-    {
-        $tableName = static::willCreateTableName($projectKey);
-        $commandRe = \Yii::$app->db2->createCommand("show table status like '$tableName'")->queryAll();
-        return empty($commandRe) ? false : true;
-    }
+//    /**
+//     * @return object|null
+//     * @throws \yii\base\InvalidConfigException
+//     */
+//    public static function getDb()
+//    {
+//        return \Yii::$app->get('db2');
+//    }
+//
+//    public static function tableIsExist($projectKey)
+//    {
+//        $tableName = static::willCreateTableName($projectKey);
+//        $commandRe = \Yii::$app->db2->createCommand("show table status like '$tableName'")->queryAll();
+//        return empty($commandRe) ? false : true;
+//    }
 
     /**
      * 修改表名生成规则可以修改这里

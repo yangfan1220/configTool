@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\CommonConfigData */
+/* @var $projectInfo app\models\service\CommonConfigDataService */
 
 $this->title = '添加配置';
 $this->params['breadcrumbs'][] = ['label' => '项目配置数据', 'url' => ['index']];
@@ -13,8 +13,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?= $this->render('_formCreate', [
-        'model' => $model,
+    <?= $this->render('_formCreate',[
+        'projectInfo'=>$projectInfo,
     ]) ?>
 
 </div>

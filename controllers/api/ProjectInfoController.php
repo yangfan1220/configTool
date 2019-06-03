@@ -10,9 +10,11 @@ namespace app\controllers\api;
 
 use app\models\common\GetUserModel;
 use app\models\tables\ProjectInfo;
+use app\models\tables\ProjectRedisInfo;
 use yii\web\Controller;
 use yii\web\Response;
 use app\models\FormatDataStruct;
+use app\models\SetValue;
 
 
 class ProjectInfoController extends Controller
@@ -48,5 +50,37 @@ class ProjectInfoController extends Controller
             'principal_name'  => $userInfo['user_name'],
             'principal_email' => $userInfo['user_mail'],
         ]);
+    }
+
+    public function actionSetProjectRedisInfo()
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $data = \Yii::$app->request->post();
+        unset($data['_csrf']);
+        $projectRedisInfoObj = new ProjectRedisInfo();
+        $projectRedisInfoObj->attributes = $data;
+        SetValue::setConfDataRedisInfo($data);
+        //测试连接是否正常
+        $testConnectRe = SetValue::testConnect();
+        if ($testConnectRe === false) {
+            return FormatDataStruct::failed('redis连接失败');
+
+        }
+        if ($projectRedisInfoObj->validate() && $projectRedisInfoObj->save()) {
+            return FormatDataStruct::success();
+        }
+        return FormatDataStruct::failed(current($projectRedisInfoObj->getFirstErrors()));
+    }
+
+    public function actionGetProjectRedisInfo()
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $data = \Yii::$app->request->get('project_app_id');
+        $projectRedisInfoObj = new ProjectRedisInfo();
+        if(!empty($projectRedisInfoObj=$projectRedisInfoObj::findOne(['project_app_id' => $data]))){
+            $projectRedisInfo=$projectRedisInfoObj->toArray();
+            return FormatDataStruct::success($projectRedisInfo);
+        }
+        return FormatDataStruct::success();
     }
 }

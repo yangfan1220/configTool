@@ -36,7 +36,7 @@ $this->registerJs('$(function () {
        });');
 $this->registerJs('
        $(".willPushItems").on("click",".projectInfo",function(){
-        window.location.href="common-config-data/index?app_id="+$(this).attr("appId");
+        window.location.href="/common-config-data/index?app_id="+$(this).attr("appId");
   });
 ');
 ?>

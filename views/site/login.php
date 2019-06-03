@@ -20,6 +20,6 @@ use yii\bootstrap\ActiveForm;
             <label for="exampleInputPassword1">密码</label>
             <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="">
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-default">登录</button>
     </form>
 </div>

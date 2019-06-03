@@ -75,28 +75,18 @@ class SiteController extends Controller
         $data=Yii::$app->request->post();
 
         if (!empty($data)){
-            $isHasThisUser=UserInfo::find()->orWhere(['user_name'=>$data['username'],'user_mail'=>$data['username']])
+            $thisUserInfo=UserInfo::find()->orWhere(['user_name'=>$data['username'],'user_mail'=>$data['username']])
                 ->where(['user_passwd'=>$data['password']])
-                ->count();
+                ->asArray()
+                ->one();
         }
-        if(!empty($isHasThisUser)){
-            Yii::$app->session['username']=$data['username'];
+        if(!empty($thisUserInfo)){
+            Yii::$app->session['username']=$thisUserInfo['user_name'];
+            Yii::$app->session['userId']=$thisUserInfo['user_id'];
+            Yii::$app->session['userMail']=$thisUserInfo['user_mail'];
             $this->redirect('/project-info/index');
         }
-
-//        if (!Yii::$app->user->isGuest) {
-//            return $this->goHome();
-//        }
-
-        $model = new LoginForm();
-//        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-//            return $this->goBack();
-//        }
-
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+        return $this->render('login');
     }
 
     /**

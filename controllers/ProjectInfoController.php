@@ -3,12 +3,10 @@
 namespace app\controllers;
 
 use app\models\FormatDataStruct;
-use app\models\SetValue;
-use app\models\TableConfirm;
+use app\models\common\TableConfirm;
 use app\models\tables\JurisdictionInfo;
 use Yii;
 use app\models\tables\ProjectInfo;
-use app\models\ProjectInfoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -47,13 +45,6 @@ class ProjectInfoController extends Controller
      */
     public function actionIndex()
     {
-//        $searchModel = new ProjectInfoSearch();
-//        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-//
-////        var_dump($_GET);
-////        $tableIsExistRe=TableConfirm::tableIsExist($projectKey);
-////        if (!empty($tableIsExistRe)) echo $tableIsExistRe;
-
         return $this->render('index');
     }
 
@@ -80,6 +71,13 @@ class ProjectInfoController extends Controller
         $data=Yii::$app->request->post();
         $model = new ProjectInfo();
         if ($model->load($data)){
+            //创建表 在db2
+            try {
+                TableConfirm::createTable($data['ProjectInfo']['app_id']);
+            }catch (\Exception $e){
+                throw new NotFoundHttpException($e);
+            }
+            //存储信息以及权限
             $insertData=[];
             foreach ($data['app_manage_ids'] as $userId){
                 $insertData[]=[
@@ -93,7 +91,7 @@ class ProjectInfoController extends Controller
                     $transaction->commit();
                 }else{
                     $transaction->rollBack();
-                    throw new NotFoundHttpException('保存失败');
+                    throw new NotFoundHttpException('保存失败:'.current($model->getFirstErrors()));
                 }
             }catch (\Exception $e){
                 $transaction->rollBack();

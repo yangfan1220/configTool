@@ -2,125 +2,66 @@
 
 namespace app\controllers;
 
-use app\models\TableConfirm;
-use app\models\UpdateValue;
+use app\models\service\CommonConfigDataService;
 use Yii;
-use app\models\CommonConfigData;
-use app\models\CommonConfigDataSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\web\Response;
+use app\models\tables\CommonConfigData;
+use app\models\tables\CommonConfigDataSearch;
 
 
-/**
- * CommonConfigDataController implements the CRUD actions for CommonConfigData model.
- */
 class CommonConfigDataController extends Controller
 {
-    public function init()
-    {
-        Yii::$app->session['pk'] = 'test';
-        $queryParams = Yii::$app->request->queryParams;
-        if (isset($queryParams['pk']) && !empty($queryParams['pk'])) {
-            CommonConfigData::setTableName($queryParams['pk']);
-            Yii::$app->session['pk'] = $queryParams['pk'];
-            //判断是否存在该表
-            static::tableIsExist($queryParams['pk']);
-            return;
-        }
-        if (Yii::$app->session->has('pk')) {
-            CommonConfigData::setTableName(Yii::$app->session['pk']);
-            //判断是否存在该表
-            static::tableIsExist(Yii::$app->session['pk']);
-            return;
-        }
-        if (empty($queryParams['pk']) && Yii::$app->session->has('pk') === false) {
-            throw new NotFoundHttpException('会话过期，请回到主页重新登录');
-        }
-    }
-
-    private static function tableIsExist($projectkey)
-    {
-        if (TableConfirm::tableIsExist($projectkey) === false) {
-            throw new NotFoundHttpException('该表不存在，请不要修改url地址');
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class'   => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * Lists all CommonConfigData models.
-     * @return mixed
-     */
     public function actionIndex()
     {
         $searchModel = new CommonConfigDataSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, ['config_level' => 2]);
+
         return $this->render('index', [
-            'searchModel'  => $searchModel,
-            'dataProvider' => $dataProvider,
+            'searchModelValueType2'  => $searchModel,
+            'dataProviderValueType2' => $dataProvider,
         ]);
     }
 
-    /**
-     * Displays a single CommonConfigData model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new CommonConfigData model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
     public function actionCreate()
     {
-        $model = new CommonConfigData();
+        $commonConfigDataService = new CommonConfigDataService();
+        /**
+         * 保存数据时
+         */
+        if (!empty($data = Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save() && UpdateValue::setRedisValue(Yii::$app->request->post())) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $validateRe = $commonConfigDataService->validate($data);
+            if (!empty($validateRe)) {
+                throw new NotFoundHttpException($validateRe);
+            }
+
+            $commonConfigDataService->saveOperation($data);
+            return $this->redirect('/common-config-data/index');
         }
-
+        /**
+         * 正常渲染页面时
+         */
+        $projectInfo = $commonConfigDataService->getProjectInfo();
         return $this->render('create', [
-            'model' => $model,
+            'projectInfo' => $projectInfo,
         ]);
     }
 
-    /**
-     * Updates an existing CommonConfigData model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $data = Yii::$app->request->post();
+        if ($model->load($data)) {
+            $commonConfigDataService = new CommonConfigDataService();
+            $validateRe = $commonConfigDataService->validateForUpdate($data['CommonConfigData']);
+            if (!empty($validateRe)) {
+                throw new NotFoundHttpException($validateRe);
+            }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save() && UpdateValue::setRedisValue(Yii::$app->request->post())) {
-
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($commonConfigDataService->saveForUpdate($model, $data)) {
+                return $this->redirect(['index']);
+            }
         }
 
         return $this->render('update', [
@@ -128,29 +69,6 @@ class CommonConfigDataController extends Controller
         ]);
     }
 
-    /**
-     * @param $id
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
-     */
-    public function actionDelete($id)
-    {
-        $commonConfigDataModel = $this->findModel($id);
-        $commonConfigDataModel->delete();
-        UpdateValue::delRedisValue($commonConfigDataModel->getAttribute('key'));
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the CommonConfigData model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return CommonConfigData the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = CommonConfigData::findOne($id)) !== null) {
@@ -160,24 +78,4 @@ class CommonConfigDataController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionA(){
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        $a='[{
-    "name":"baby",
-    "age":27,
-    "address":"china weifang"
-},
-{
-    "name":"黄晓明",
-    "age":30,
-    "address":"china yantai"
-},
-{
-    "name":"鹿晗",
-    "age":22,
-    "address":"china qingdao"
-}]';
-        return json_decode($a,true);
-    }
 }

@@ -64,6 +64,10 @@ class SetValue
         return array_column($confData, 'value', 'key');
     }
 
+    /**
+     * 设置redis连接信息  在用
+     * @param $redisInfo
+     */
     public static function setConfDataRedisInfo($redisInfo)
     {
         self::$redisConnection = \Yii::$app->redis;
@@ -73,6 +77,10 @@ class SetValue
         self::$redisConnection->password = $redisInfo['redis_password'];
     }
 
+    /**
+     * 测试连接   在用
+     * @return bool
+     */
     public static function testConnect()
     {
         $testSetRe = self::$redisConnection->set('test', 'testConnection');
