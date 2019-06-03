@@ -15,6 +15,7 @@ class CommonConfigDataController extends Controller
     public function actionIndex()
     {
         $searchModel = new CommonConfigDataSearch();
+        !empty(\Yii::$app->request->get('app_id')) ? \Yii::$app->session['app_id'] = \Yii::$app->request->get('app_id') : [];
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, ['config_level' => 2]);
 
         return $this->render('index', [

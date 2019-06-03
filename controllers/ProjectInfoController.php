@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\FormatDataStruct;
 use app\models\common\TableConfirm;
+use app\models\service\ProjectInfoService;
 use app\models\tables\JurisdictionInfo;
 use Yii;
 use app\models\tables\ProjectInfo;
@@ -71,6 +72,8 @@ class ProjectInfoController extends Controller
         $data=Yii::$app->request->post();
         $model = new ProjectInfo();
         if ($model->load($data)){
+            ProjectInfoService::validate($data);
+
             //创建表 在db2
             try {
                 TableConfirm::createTable($data['ProjectInfo']['app_id']);

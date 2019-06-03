@@ -73,6 +73,8 @@
       <path value="$PROJECT_DIR$/vendor/yiisoft/yii2-gii" />
       <path value="$PROJECT_DIR$/vendor/ole/codegenerat" />
       <path value="$PROJECT_DIR$/vendor/yiisoft/yii2-redis" />
+      <path value="$PROJECT_DIR$/vendor/kartik-v/yii2-krajee-base" />
+      <path value="$PROJECT_DIR$/vendor/kartik-v/yii2-widget-select2" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.3" />

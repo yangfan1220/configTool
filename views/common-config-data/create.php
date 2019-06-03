@@ -9,7 +9,7 @@ $this->title = '添加配置';
 $this->params['breadcrumbs'][] = ['label' => '项目配置数据', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="common-config-data-create">
+<div class="common-config-data-create" style="margin-left: 30%;margin-right: 30%">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
