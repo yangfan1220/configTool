@@ -33,7 +33,7 @@ class ConfigDataModifyLog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['modify_type', 'app_id', 'key', 'old_value', 'new_value', 'comment', 'create_name'], 'required'],
+            [['modify_type', 'app_id', 'key', 'comment', 'create_name'], 'required'],
             [['modify_type'], 'integer'],
             [['old_value', 'new_value'], 'string'],
             [['create_time'], 'safe'],

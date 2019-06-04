@@ -59,7 +59,6 @@ class CommonConfigDataController extends Controller
             if (!empty($validateRe)) {
                 throw new NotFoundHttpException($validateRe);
             }
-
             if ($commonConfigDataService->saveForUpdate($model, $data)) {
                 return $this->redirect(['index']);
             }
