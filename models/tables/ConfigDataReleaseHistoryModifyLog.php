@@ -36,7 +36,7 @@ class ConfigDataReleaseHistoryModifyLog extends \yii\db\ActiveRecord
             [['old_value', 'new_value'], 'string'],
             [['app_id'], 'string', 'max' => 50],
             [['release_name', 'key'], 'string', 'max' => 128],
-            [['app_id', 'key'], 'unique', 'targetAttribute' => ['app_id', 'key']],
+            [['app_id', 'release_name', 'key'], 'unique', 'targetAttribute' => ['app_id', 'release_name', 'key']],
         ];
     }
 

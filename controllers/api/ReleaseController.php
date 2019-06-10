@@ -67,5 +67,6 @@ class ReleaseController extends Controller
         $data=\Yii::$app->request->post();
         ReleaseService::releaseValidate($data);
         ReleaseService::Release($data);
+        return FormatDataStruct::success();
     }
 }

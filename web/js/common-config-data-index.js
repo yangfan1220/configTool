@@ -14,7 +14,7 @@ $(function() {
                 }
             },
             error: function (err) {
-                alert("直接error了"+data.message);
+                alert("直接error了"+err['responseJSON']['message']);
             }
         });
     });
@@ -72,13 +72,14 @@ $(function () {
               if (data.code==0){
                   var str=generateTableForPublish(data.data);
                   $('.change>table').remove();
+                  $('.change>div').remove();
                   $('.change').append(str);
               }else {
                   alert("获取项目信息失败 code 不等于0"+data.message);
               }
           },
           error: function (err) {
-              alert("直接error了"+data.message);
+              alert("直接error了"+err['responseJSON']['message']);
           }
       });
   });
@@ -94,13 +95,13 @@ $(function () {
             data:{releaseName:$('.release-release-name').val(),releaseComment:$('.release-release-comment').val()},
             success: function (data) {
                 if (data.code==0){
-
+                    window.location.href='/common-config-data/index';
                 }else {
                     alert("获取项目信息失败 code 不等于0"+data.message);
                 }
             },
             error: function (err) {
-                alert("直接error了"+data.message);
+                alert("直接error了"+err['responseJSON']['message']);
             }
         });
     });

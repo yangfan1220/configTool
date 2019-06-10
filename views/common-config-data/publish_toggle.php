@@ -15,7 +15,7 @@ use  yii\helpers\Html;
 <?= Html::tag('span', '',['class'=>['glyphicon','glyphicon-asterisk'],'style'=>['color'=>'red','display'=>'inline']]) ?>
 <?= Html::tag('label', 'Release Name',['style'=>['font-size'=>'20px']])."<br/>" ?>
 
-<?= Html::input('text','release_name','',['class'=>['form-control','release-release-name'],'style'=>['width'=>'70%','margin-left'=>'5%']]);?>
+<?= Html::input('text','release_name',date('YmdHis').'-release',['class'=>['form-control','release-release-name'],'style'=>['width'=>'70%','margin-left'=>'5%']]);?>
 
 
 <?= Html::tag('label', 'Comment',['style'=>['font-size'=>'20px']])."<br/>" ?>

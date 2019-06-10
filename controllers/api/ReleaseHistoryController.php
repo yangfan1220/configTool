@@ -7,6 +7,7 @@
  */
 
 namespace app\controllers\api;
+
 use app\models\tables\ConfigDataReleaseHistory;
 use app\models\tables\ConfigDataReleaseHistoryAllLog;
 use app\models\tables\ConfigDataReleaseHistoryModifyLog;
@@ -23,7 +24,7 @@ class ReleaseHistoryController extends Controller
     public function actionGetReleaseHistory()
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
-        $data=ConfigDataReleaseHistory::find()->where(['app_id'=>\Yii::$app->session['app_id']])->asArray()->all();
+        $data=ConfigDataReleaseHistory::find()->where(['app_id'=>\Yii::$app->session['app_id']])->orderBy(['id'=>SORT_DESC])->asArray()->all();
         return FormatDataStruct::success($data);
     }
 

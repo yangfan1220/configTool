@@ -37,7 +37,7 @@ class ConfigDataReleaseHistory extends \yii\db\ActiveRecord
             [['app_id', 'create_name'], 'string', 'max' => 50],
             [['release_name'], 'string', 'max' => 128],
             [['comment'], 'string', 'max' => 512],
-            [['release_name'], 'unique'],
+            [['app_id', 'current_record_style', 'release_name'], 'unique', 'targetAttribute' => ['app_id', 'current_record_style', 'release_name']],
         ];
     }
 

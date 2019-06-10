@@ -5,8 +5,13 @@ use yii\bootstrap\Modal;
 use yii\grid\GridView;
 use app\models\Emum\CommonConfigDataEmum;
 use app\assets\CommonConfigDataIndexAsset;
+use app\models\common\ReleaseStatusModel;
+use app\models\Emum\ConfigDataModifyLogEmum;
+use app\models\service\ReleaseService;
 
 CommonConfigDataIndexAsset::register($this);
+$releaseStatusData = ReleaseStatusModel::formatReleaseStatus();
+$currentKeyStatus=ReleaseService::getReleaseChanges();
 
 /* @var $this yii\web\View */
 /* @var $searchModelValueType2 app\models\CommonConfigDataSearch */
@@ -33,16 +38,16 @@ $this->registerJs('$(function () {
                 }
             },
             error: function (err) {
-                alert("直接error了"+data.message);
+                alert("直接error了"+err[\'responseJSON\'][\'message\']);
             }
         });
     });');
 
 Modal::begin([
-    'id'     => 'create-modal',
-    'header' => '<h4 class="modal-title">项目redis信息</h4>',
-    'footer' => '<a href="#" class="btn btn-primary" data-dismiss="modal">关闭</a>',
-    'bodyOptions'=>['class'=>'projectRedisInfo'],
+    'id'          => 'create-modal',
+    'header'      => '<h4 class="modal-title">项目redis信息</h4>',
+    'footer'      => '<a href="#" class="btn btn-primary" data-dismiss="modal">关闭</a>',
+    'bodyOptions' => ['class' => 'projectRedisInfo'],
 ]);
 $csrf = Yii::$app->request->csrfToken;
 $js = <<<JS
@@ -198,15 +203,15 @@ $this->registerJs($js);
         <?= Html::button('表格', ['class' => 'btn btn-success', 'style' => [], 'id' => 'table-button']) ?>
         <?= Html::button('更改历史', ['class' => 'btn btn-success', 'style' => [], 'id' => 'modify-history-button']) ?>
         <?= Html::a('添加配置', ['create'], ['class' => 'btn btn-success', 'style' => ['float' => 'right']]) ?>
-        <?= Html::a('发布历史', ['/release-history/index'], ['class' => 'btn btn-success', 'style' => ['float' => 'right','margin-right'=>'4px']]) ?>
-        <?= Html::button('发布', ['class' => 'btn btn-success index-release', 'style' => ['float' => 'right','margin-right'=>'4px'], 'id' => 'publish-button','data-target'=>'#publish-modal', 'data-toggle'=>'modal']) ?>
+        <?= Html::a('发布历史', ['/release-history/index'], ['class' => 'btn btn-success', 'style' => ['float' => 'right', 'margin-right' => '4px']]) ?>
+        <?= Html::button('发布', ['class' => 'btn btn-success index-release', 'style' => ['float' => 'right', 'margin-right' => '4px'], 'id' => 'publish-button', 'data-target' => '#publish-modal', 'data-toggle' => 'modal']) ?>
         <?php
         Modal::begin([
-            'id' => 'publish-modal',
-            'header' => '<h4 class="modal-title">发布</h4>',
-            'footer' => '<a href="#" class="btn btn-primary" data-dismiss="modal">关闭</a>',
-            'bodyOptions'=>['class'=>'publish'],
-            'size'=>'modal-lg',
+            'id'          => 'publish-modal',
+            'header'      => '<h4 class="modal-title">发布</h4>',
+            'footer'      => '<a href="#" class="btn btn-primary" data-dismiss="modal">关闭</a>',
+            'bodyOptions' => ['class' => 'publish'],
+            'size'        => 'modal-lg',
         ]);
         echo $this->render('publish_toggle');
         Modal::end();
@@ -230,36 +235,40 @@ $this->registerJs($js);
                 return array_search($model->config_level, CommonConfigDataEmum::$configLevel);
             }
             ],
-//            [
-//                'attribute' => 'publish_status', 'content' => function ($model, $key, $index, $column) {
-//                $class=[];
-//                if($model->publish_status==ConfigDataModifyLogEmum::$dontPublishStatus){
-//                    $class=['class'=>['btn-warning']];
-//                }
-//                return Html::tag('div',ConfigDataModifyLogEmum::$publishStatus[$model->publish_status],$class);
-//            }
-//            ],
-            'key',
-
-
-//            [
-//                'attribute' => 'key', 'content' => function ($model, $key, $index, $column) {
-//                $class=[];
-//                switch ($model->current_config_status){
-//                    case CommonConfigDataEmum::$currentConfigStatusAdd:
-//                        $class=['class'=>['btn-success'],'style'=>'display:inline'];
-//                        break;
-//                    case CommonConfigDataEmum::$currentConfigStatusModify:
-//                        $class=['class'=>['btn-info'],'style'=>'display:inline'];
-//                        break;
-//                    case CommonConfigDataEmum::$currentConfigStatusDel:
-//                        $class=['class'=>['btn-danger'],'style'=>'display:inline'];
-//                        break;
-//                }
-//                $content=$model->key.Html::tag('div',CommonConfigDataEmum::$current_config_status[$model->current_config_status],$class);
-//                return Html::tag('div',$content,['style'=>'display:inline']);
-//            }
-//            ],
+            [
+                'label' => '发布状态', 'content' => function ($model, $key, $index, $column) use ($releaseStatusData) {
+                $publishStatus = 1;
+                if (in_array(md5($model->getAttribute('key') . $model->getAttribute('value')), $releaseStatusData)) {
+                    $publishStatus = 2;
+                }
+                $class = ['class' => ['btn-success']];
+                if ($publishStatus == ConfigDataModifyLogEmum::$dontPublishStatus) {
+                    $class = ['class' => ['btn-warning']];
+                }
+                return Html::tag('div', ConfigDataModifyLogEmum::$publishStatus[$publishStatus], $class);
+            }
+            ],
+            [
+                'attribute' => 'key', 'content' => function ($model, $key, $index, $column) use ($currentKeyStatus) {
+                $class = [];
+                if(!isset($currentKeyStatus[$model->key])){
+                    return $model->key;
+                }
+                switch ($currentKeyStatus[$model->key]['status']) {
+                    case CommonConfigDataEmum::$currentConfigStatusAdd:
+                        $class = ['class' => ['btn-success'], 'style' => 'display:inline'];
+                        break;
+                    case CommonConfigDataEmum::$currentConfigStatusModify:
+                        $class = ['class' => ['btn-info'], 'style' => 'display:inline'];
+                        break;
+                    case CommonConfigDataEmum::$currentConfigStatusDel:
+                        $class = ['class' => ['btn-danger'], 'style' => 'display:inline'];
+                        break;
+                }
+                $content = $model->key . Html::tag('div', CommonConfigDataEmum::$current_config_status[$currentKeyStatus[$model->key]['status']], $class);
+                return Html::tag('div', $content, ['style' => 'display:inline']);
+            }
+            ],
 
 
             'value',

@@ -8,6 +8,7 @@ $config = [
     'sourceLanguage' => 'en-US',
     'language' => 'zh-CN',
     'name'=>'配置工具',
+    'timeZone' => 'Asia/Shanghai',
     'basePath' => dirname(__DIR__),
     'defaultRoute'=>'project-info/index',
     'bootstrap' => ['log'],

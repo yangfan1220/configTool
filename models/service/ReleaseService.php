@@ -100,7 +100,7 @@ class ReleaseService
             $transaction->commit();
         }catch (\Exception $e){
             $transaction->rollBack();
-            throw new $e;
+            throw new NotFoundHttpException($e->getMessage());
         }
     }
 }

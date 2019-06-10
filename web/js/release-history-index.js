@@ -12,11 +12,12 @@ $(function () {
             }
         },
         error: function (err) {
-            alert("直接error了"+data.message);
+            alert("直接error了"+err['responseJSON']['message']);
         }
     });
     $('#ReleaseHistoryList').on('click','.ReleaseHistory',function () {
         $('.ReleaseHistory').removeAttr('click');
+        $('.ReleaseHistory').css('background-color','');
         //填充值
         $('.version').empty();
         $('.datetime').empty();
@@ -25,7 +26,7 @@ $(function () {
         $('.version').append(version);
         $('.datetime').append(create_time);
         $(this).attr('click','true');
-        // $(this).css('background-color','#9a9595');
+        $(this).css('background-color','#9a9595');
 
     });
 
@@ -45,8 +46,9 @@ function generateReleaseHistoryList(data) {
     var  str='';
     var releaseStatus = {1:"普通发布", 2:"回滚"};
 
-   var  time=formatDate(data[0]["create_time"]);
+
     for (let k in data) {
+        var  time=formatDate(data[k]["create_time"]);
         str+='<div class="ReleaseHistory" style="border-right: #0f0f0f 4px ridge;height: 50px;cursor:pointer;" version='+data[k]["release_name"]+' create_time="'+[data[k]["create_time"]]+'"> <div style="padding-top: 5%"><div style="display: inline">'+data[k]["create_name"]+'</div><div id="releaseStatus">'+releaseStatus[data[k]["current_record_style"]]+'</div><div id="releaseDate">'+time+'</div></div></div> ';
     }
     return str;
@@ -106,7 +108,7 @@ function getConfig(configType) {
             }
         },
         error: function (err) {
-            alert("直接error了"+err.message);
+            alert("直接error了"+err['responseJSON']['message']);
         }
     });
 }
