@@ -2,14 +2,13 @@
 
 namespace app\models\tables;
 
-use app\models\common\TableConfirm;
 use Yii;
 
 /**
- * This is the model class for table "test_app_id_config_data".
+ * This is the model class for table "common_config_data".
  *
  * @property int $id
- * @property string $key_value_mictime_md5 生成的MD5值,用于确保一个唯一，主要是用来生成唯一码从而不使用id，日志使用
+ * @property string $app_id 项目(应用)唯一key
  * @property int $config_level 配置等级：1：私有的（只能被自己接收到）。2：公有的（设定的appid能接收到）
  * @property string $key 配置名称
  * @property string $value 配置内容
@@ -22,25 +21,12 @@ use Yii;
  */
 class CommonConfigData extends \yii\db\ActiveRecord
 {
-    public static $tableName;
-
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return static::$tableName ?: TableConfirm::willCreateTableName(Yii::$app->session['app_id']);
-    }
-
-    public static function setTableName($tableName)
-    {
-        static::$tableName = $tableName;
-    }
-
-
-    public static function getDb()
-    {
-        return Yii::$app->get('db2');
+        return 'common_config_data';
     }
 
     /**
@@ -49,15 +35,14 @@ class CommonConfigData extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['key_value_mictime_md5', 'config_level', 'key', 'value', 'comment', 'value_type', 'create_name'], 'required'],
+            [['app_id', 'config_level', 'key', 'value', 'comment', 'value_type', 'create_name'], 'required'],
             [['config_level', 'value_type'], 'integer'],
             [['value'], 'string'],
             [['create_time', 'update_time'], 'safe'],
-            [['key_value_mictime_md5', 'create_name', 'modify_name'], 'string', 'max' => 50],
+            [['app_id', 'create_name', 'modify_name'], 'string', 'max' => 50],
             [['key'], 'string', 'max' => 128],
             [['comment'], 'string', 'max' => 512],
-            [['key_value_mictime_md5'], 'unique'],
-            [['key'], 'unique'],
+            [['app_id', 'key'], 'unique', 'targetAttribute' => ['app_id', 'key']],
         ];
     }
 
@@ -67,17 +52,17 @@ class CommonConfigData extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id'                    => 'ID',
-            'key_value_mictime_md5' => 'MD5',
-            'config_level'          => '配置等级',
-            'key'                   => '配置名称',
-            'value'                 => '配置内容',
-            'comment'               => '配置注释',
-            'value_type'            => '配置内容的类型',
-            'create_name'           => '创建人',
-            'modify_name'           => '修改人',
-            'create_time'           => '创建时间',
-            'update_time'           => '更新时间',
+            'id' => 'ID',
+            'app_id' => '项目(应用)唯一key',
+            'config_level' => '配置等级',
+            'key' => '配置名称',
+            'value' => '配置内容',
+            'comment' => '配置注释',
+            'value_type' => '配置内容的类型',
+            'create_name' => '创建人',
+            'modify_name' => '修改人',
+            'create_time' => '创建时间',
+            'update_time' => '更新时间',
         ];
     }
 }

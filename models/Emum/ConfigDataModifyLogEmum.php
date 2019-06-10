@@ -19,4 +19,11 @@ class ConfigDataModifyLogEmum
         2 => '修改',
         3 => '删除',
     ];
+
+    public static $dontPublishStatus=1;
+    public static $alreadyPublishStatus=2;
+    public static $publishStatus=[
+        1=>'未发布',
+        2=>'已发布',
+    ];
 }

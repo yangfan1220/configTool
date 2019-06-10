@@ -4,6 +4,9 @@ use yii\helpers\Html;
 use yii\bootstrap\Modal;
 use yii\grid\GridView;
 use app\models\Emum\CommonConfigDataEmum;
+use app\assets\CommonConfigDataIndexAsset;
+
+CommonConfigDataIndexAsset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $searchModelValueType2 app\models\CommonConfigDataSearch */
@@ -39,12 +42,13 @@ Modal::begin([
     'id'     => 'create-modal',
     'header' => '<h4 class="modal-title">项目redis信息</h4>',
     'footer' => '<a href="#" class="btn btn-primary" data-dismiss="modal">关闭</a>',
+    'bodyOptions'=>['class'=>'projectRedisInfo'],
 ]);
 $csrf = Yii::$app->request->csrfToken;
 $js = <<<JS
     $(function() {
         var csrfToken = $('meta[name="csrf-token"]').attr("content");
-      $('.modal-body').html($(".willDisplay").html());
+      $('.projectRedisInfo').html($(".willDisplay").html());
       $(".willDisplaySubmit").click(function() {
         $.ajax({
             url: "/api/project-info/set-project-redis-info",
@@ -191,32 +195,90 @@ $this->registerJs($js);
     </div>
 
     <p>
-        <?= Html::a('添加配置', ['create'], ['class' => 'btn btn-success', 'style' => ['margin-left' => '90%']]) ?>
+        <?= Html::button('表格', ['class' => 'btn btn-success', 'style' => [], 'id' => 'table-button']) ?>
+        <?= Html::button('更改历史', ['class' => 'btn btn-success', 'style' => [], 'id' => 'modify-history-button']) ?>
+        <?= Html::a('添加配置', ['create'], ['class' => 'btn btn-success', 'style' => ['float' => 'right']]) ?>
+        <?= Html::a('发布历史', ['/release-history/index'], ['class' => 'btn btn-success', 'style' => ['float' => 'right','margin-right'=>'4px']]) ?>
+        <?= Html::button('发布', ['class' => 'btn btn-success index-release', 'style' => ['float' => 'right','margin-right'=>'4px'], 'id' => 'publish-button','data-target'=>'#publish-modal', 'data-toggle'=>'modal']) ?>
+        <?php
+        Modal::begin([
+            'id' => 'publish-modal',
+            'header' => '<h4 class="modal-title">发布</h4>',
+            'footer' => '<a href="#" class="btn btn-primary" data-dismiss="modal">关闭</a>',
+            'bodyOptions'=>['class'=>'publish'],
+            'size'=>'modal-lg',
+        ]);
+        echo $this->render('publish_toggle');
+        Modal::end();
+
+        ?>
+
     </p>
 
 
 </div>
-<div >
-    <?=Html::tag('div','项目配置',['class'=>['h3'],'style'=>['text-align'=>'center']])?>
-<?=GridView::widget([
-    'dataProvider' => $dataProviderValueType2,
-    'filterModel'=>$searchModelValueType2,
-    'columns' => [
-        ['class' => 'yii\grid\SerialColumn'],
-        'id',
-        ['attribute' => 'config_level','content'=>function ($model, $key, $index, $column) {
-            return array_search($model->config_level,CommonConfigDataEmum::$configLevel);
-        }],
-        'key',
-        'value',
-        'comment',
-        ['attribute' => 'value_type','content'=>function ($model, $key, $index, $column) {
-            return array_search($model->value_type,CommonConfigDataEmum::$valueType);
-        }],
-        'create_name',
-        'modify_name',
-        ['class' => 'yii\grid\ActionColumn','header'=>'操作','visibleButtons'=>['delete'=>false,'view'=>false,'update'=>true]],
-    ],
-]);?>
+<div class="project-config-info-display">
+    <?= Html::tag('div', '项目配置', ['class' => ['h3'], 'style' => ['text-align' => 'center']]) ?>
+    <?= GridView::widget([
+        'dataProvider' => $dataProviderValueType2,
+        'filterModel'  => $searchModelValueType2,
+        'columns'      => [
+            ['class' => 'yii\grid\SerialColumn'],
+            'id',
+            [
+                'attribute' => 'config_level', 'content' => function ($model, $key, $index, $column) {
+                return array_search($model->config_level, CommonConfigDataEmum::$configLevel);
+            }
+            ],
+//            [
+//                'attribute' => 'publish_status', 'content' => function ($model, $key, $index, $column) {
+//                $class=[];
+//                if($model->publish_status==ConfigDataModifyLogEmum::$dontPublishStatus){
+//                    $class=['class'=>['btn-warning']];
+//                }
+//                return Html::tag('div',ConfigDataModifyLogEmum::$publishStatus[$model->publish_status],$class);
+//            }
+//            ],
+            'key',
+
+
+//            [
+//                'attribute' => 'key', 'content' => function ($model, $key, $index, $column) {
+//                $class=[];
+//                switch ($model->current_config_status){
+//                    case CommonConfigDataEmum::$currentConfigStatusAdd:
+//                        $class=['class'=>['btn-success'],'style'=>'display:inline'];
+//                        break;
+//                    case CommonConfigDataEmum::$currentConfigStatusModify:
+//                        $class=['class'=>['btn-info'],'style'=>'display:inline'];
+//                        break;
+//                    case CommonConfigDataEmum::$currentConfigStatusDel:
+//                        $class=['class'=>['btn-danger'],'style'=>'display:inline'];
+//                        break;
+//                }
+//                $content=$model->key.Html::tag('div',CommonConfigDataEmum::$current_config_status[$model->current_config_status],$class);
+//                return Html::tag('div',$content,['style'=>'display:inline']);
+//            }
+//            ],
+
+
+            'value',
+            'comment',
+            [
+                'attribute' => 'value_type', 'content' => function ($model, $key, $index, $column) {
+                return array_search($model->value_type, CommonConfigDataEmum::$valueType);
+            },
+            ],
+            'create_name',
+            'modify_name',
+            ['class' => 'yii\grid\ActionColumn', 'header' => '操作', 'visibleButtons' => ['delete' => false, 'view' => false, 'update' => true]],
+        ],
+    ]); ?>
+
+</div>
+
+<!--  切换标签数据的容器-->
+<div class="modify-history-container">
+
 
 </div>

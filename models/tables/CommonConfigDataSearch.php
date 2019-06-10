@@ -59,19 +59,21 @@ class CommonConfigDataSearch extends CommonConfigData
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'id'           => $this->id,
+            'app_id'       => \Yii::$app->session['app_id'],
             'config_level' => $this->config_level,
-            'value_type' => $this->value_type,
-            'create_time' => $this->create_time,
-            'update_time' => $this->update_time,
+            'value_type'   => $this->value_type,
+            'create_time'  => $this->create_time,
+            'update_time'  => $this->update_time,
         ]);
 
-        $query->andFilterWhere(['like', 'key_value_mictime_md5', $this->key_value_mictime_md5])
-            ->andFilterWhere(['like', 'key', $this->key])
+        $query->andFilterWhere(['like', 'key', $this->key])
             ->andFilterWhere(['like', 'value', $this->value])
             ->andFilterWhere(['like', 'comment', $this->comment])
             ->andFilterWhere(['like', 'create_name', $this->create_name])
             ->andFilterWhere(['like', 'modify_name', $this->modify_name]);
+
+        $query->orderBy(['id'=>SORT_DESC]);
 
         return $dataProvider;
     }

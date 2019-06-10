@@ -2,8 +2,6 @@
 
 namespace app\controllers;
 
-use app\models\FormatDataStruct;
-use app\models\common\TableConfirm;
 use app\models\service\ProjectInfoService;
 use app\models\tables\JurisdictionInfo;
 use Yii;
@@ -69,17 +67,11 @@ class ProjectInfoController extends Controller
      */
     public function actionCreate()
     {
+        //TODO  优化
         $data=Yii::$app->request->post();
         $model = new ProjectInfo();
         if ($model->load($data)){
             ProjectInfoService::validate($data);
-
-            //创建表 在db2
-            try {
-                TableConfirm::createTable($data['ProjectInfo']['app_id']);
-            }catch (\Exception $e){
-                throw new NotFoundHttpException($e);
-            }
             //存储信息以及权限
             $insertData=[];
             foreach ($data['app_manage_ids'] as $userId){
@@ -125,13 +117,6 @@ class ProjectInfoController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing ProjectInfo model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
@@ -153,36 +138,5 @@ class ProjectInfoController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    public function actionFirst($projectKey)
-    {
-        $this->layout = false;
-        $tableIsExistRe = TableConfirm::tableIsExist($projectKey);
-        return $this->render('first', [
-            'tableIsExistRe' => $tableIsExistRe,
-            'createTableDDL' => sprintf(Yii::$app->params['createConfigDataStorageTableDDL'], TableConfirm::willCreateTableName($projectKey)),
-            'projectKey'     => $projectKey,
-        ]);
-    }
-
-    public function actionCreateTable()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $this->layout = false;
-        $projectKey = Yii::$app->request->post('projectKey');
-        if (TableConfirm::tableIsExist($projectKey)) {
-            $this->redirect('/project-info/index');
-        }
-        try {
-            $createTableRe = TableConfirm::createTable($projectKey);
-        } catch (\Exception $e) {
-            $createTableRe = $e->getMessage();
-        }
-        if ($createTableRe === 0) {
-            return FormatDataStruct::success($createTableRe);
-        } else {
-            return FormatDataStruct::failed($createTableRe);
-        }
     }
 }

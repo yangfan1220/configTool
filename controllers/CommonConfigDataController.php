@@ -16,7 +16,7 @@ class CommonConfigDataController extends Controller
     {
         $searchModel = new CommonConfigDataSearch();
         !empty(\Yii::$app->request->get('app_id')) ? \Yii::$app->session['app_id'] = \Yii::$app->request->get('app_id') : [];
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, ['config_level' => 2]);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModelValueType2'  => $searchModel,
@@ -32,12 +32,8 @@ class CommonConfigDataController extends Controller
          */
         if (!empty($data = Yii::$app->request->post())) {
 
-            $validateRe = $commonConfigDataService->validate($data);
-            if (!empty($validateRe)) {
-                throw new NotFoundHttpException($validateRe);
-            }
-
-            $commonConfigDataService->saveOperation($data);
+            $commonConfigDataService->validate($data);
+            $commonConfigDataService->insertOperation($data);
             return $this->redirect('/common-config-data/index');
         }
         /**
@@ -53,15 +49,11 @@ class CommonConfigDataController extends Controller
     {
         $model = $this->findModel($id);
         $data = Yii::$app->request->post();
-        if ($model->load($data)) {
+        if(!empty($data)){
             $commonConfigDataService = new CommonConfigDataService();
-            $validateRe = $commonConfigDataService->validateForUpdate($data['CommonConfigData']);
-            if (!empty($validateRe)) {
-                throw new NotFoundHttpException($validateRe);
-            }
-            if ($commonConfigDataService->saveForUpdate($model, $data)) {
-                return $this->redirect(['index']);
-            }
+            $commonConfigDataService->validateForUpdate($data['CommonConfigData']);
+            $commonConfigDataService->updateOperation($id, $data);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [
