@@ -73,7 +73,7 @@ class CommonConfigDataSearch extends CommonConfigData
             ->andFilterWhere(['like', 'create_name', $this->create_name])
             ->andFilterWhere(['like', 'modify_name', $this->modify_name]);
 
-        $query->orderBy(['id'=>SORT_DESC]);
+//        $query->orderBy(['id'=>SORT_DESC]);
 
         return $dataProvider;
     }

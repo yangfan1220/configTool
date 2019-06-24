@@ -106,3 +106,25 @@ $(function () {
         });
     });
 });
+
+$(function () {
+    $('.rollback-button').click(function () {
+        if(confirm('确认回滚？')){
+            $.ajax({
+                url: "/api/roll-back/roll-back",
+                type: "post",
+                // data:,
+                success: function (data) {
+                    if (data.code==0){
+
+                    }else {
+                        alert("获取项目信息失败 code 不等于0"+data.message);
+                    }
+                },
+                error: function (err) {
+                    alert("直接error了"+err['responseJSON']['message']);
+                }
+            });
+        }
+    });
+});

@@ -9,7 +9,6 @@
 namespace app\models\common;
 
 use app\models\tables\ConfigDataReleaseHistoryAllLog;
-use function foo\func;
 use Yii;
 
 class ReleaseStatusModel
@@ -27,6 +26,28 @@ class ReleaseStatusModel
              $val=md5($val['key'].$val['value']);
         });
        return $data;
+    }
+
+    public function a()
+    {
+        $key = 'user:1:api_count';
+
+        $limit = 10;
+
+        $check = $redis->exists($key);
+        if($check){
+            $redis->incr($key);
+            $count = $redis->get($key);
+            if($count > 10){
+                exit('超了');
+            }
+        }else{
+            $redis->incr($key);
+            $redis->expire($key,60);
+        }
+
+        $count = $redis->get($key);
+        echo 'You have '.$count.' request';
     }
 
 }

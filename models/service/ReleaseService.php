@@ -24,12 +24,8 @@ class ReleaseService
 
     private static function getCurrentAlreadyReleaseConfigDataByAppId($appId)
     {
-        $data = ConfigDataReleaseHistory::find()
-            ->select(['config_data_release_history_all_log.key', 'config_data_release_history_all_log.value'])
-            ->leftJoin('config_data_release_history_all_log', '`config_data_release_history`.`release_name` = `config_data_release_history_all_log`.`release_name`')
-            ->where(['config_data_release_history.app_id' => $appId])
-            ->asArray()
-            ->all();
+        $data= ConfigDataReleaseHistory::findBySql('SELECT `key`,`value` FROM `config_data_release_history_all_log` WHERE `app_id`=:app_id AND `release_name`=(SELECT `release_name` FROM `config_data_release_history` WHERE `app_id`=:app_id ORDER BY `id`
+ DESC LIMIT 1)',[':app_id'=>$appId])->asArray()->all();
         return array_column($data, 'value', 'key');
     }
 

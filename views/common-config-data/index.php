@@ -205,6 +205,7 @@ $this->registerJs($js);
         <?= Html::a('添加配置', ['create'], ['class' => 'btn btn-success', 'style' => ['float' => 'right']]) ?>
         <?= Html::a('发布历史', ['/release-history/index'], ['class' => 'btn btn-success', 'style' => ['float' => 'right', 'margin-right' => '4px']]) ?>
         <?= Html::button('发布', ['class' => 'btn btn-success index-release', 'style' => ['float' => 'right', 'margin-right' => '4px'], 'id' => 'publish-button', 'data-target' => '#publish-modal', 'data-toggle' => 'modal']) ?>
+        <?= Html::button('回滚', ['class' => 'btn btn-success rollback-button', 'style' => ['float' => 'right', 'margin-right' => '4px'],]) ?>
         <?php
         Modal::begin([
             'id'          => 'publish-modal',
