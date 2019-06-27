@@ -45,11 +45,11 @@ class SiteController extends Controller
     public function actions()
     {
         return [
-            'error' => [
+            'error'   => [
                 'class' => 'yii\web\ErrorAction',
             ],
             'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
+                'class'           => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
@@ -72,18 +72,19 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        $data=Yii::$app->request->post();
+        $data = Yii::$app->request->post();
 
-        if (!empty($data)){
-            $thisUserInfo=UserInfo::find()->orWhere(['user_name'=>$data['username'],'user_mail'=>$data['username']])
-                ->where(['user_passwd'=>$data['password']])
+        if (!empty($data)) {
+            $thisUserInfo = UserInfo::find()
+                ->where('user_passwd=:user_passwd', [':user_passwd' => $data['password']])
+                ->andWhere(['or', 'user_name=:user_name', 'user_mail=:user_mail'], [':user_name' => $data['username'], ':user_mail' => $data['username']])
                 ->asArray()
                 ->one();
         }
-        if(!empty($thisUserInfo)){
-            Yii::$app->session['username']=$thisUserInfo['user_name'];
-            Yii::$app->session['userId']=$thisUserInfo['user_id'];
-            Yii::$app->session['userMail']=$thisUserInfo['user_mail'];
+        if (!empty($thisUserInfo)) {
+            Yii::$app->session['username'] = $thisUserInfo['user_name'];
+            Yii::$app->session['userId'] = $thisUserInfo['user_id'];
+            Yii::$app->session['userMail'] = $thisUserInfo['user_mail'];
             $this->redirect('/project-info/index');
         }
         return $this->render('login');

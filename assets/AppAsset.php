@@ -21,11 +21,15 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        'css/input-autocomplete.css',
     ];
     public $js = [
+        'js/input-autocomplete.js',
+        'js/dropDownLayouts.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
+        'yii\web\JqueryAsset',
     ];
 }

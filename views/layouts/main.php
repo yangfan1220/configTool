@@ -54,6 +54,8 @@ AppAsset::register($this);
              'class'=>'form-control',
              'placeholder'=>'搜索项目(AppId、项目名称)',
              'style'=>'width:20%;display:inline;margin-top:0.5%;margin-left:30%;',
+             'id'=>'callback',
+             "autocomplete"=>"off",
      ]);
 
      Html::endForm();
