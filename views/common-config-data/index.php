@@ -205,8 +205,9 @@ $this->registerJs($js);
         <?= Html::a('添加配置', ['create'], ['class' => 'btn btn-success', 'style' => ['float' => 'right']]) ?>
         <?= Html::a('发布历史', ['/release-history/index'], ['class' => 'btn btn-success', 'style' => ['float' => 'right', 'margin-right' => '4px']]) ?>
         <?= Html::button('发布', ['class' => 'btn btn-success index-release', 'style' => ['float' => 'right', 'margin-right' => '4px'], 'id' => 'publish-button', 'data-target' => '#publish-modal', 'data-toggle' => 'modal']) ?>
-        <?= Html::button('回滚', ['class' => 'btn btn-success rollback-button', 'style' => ['float' => 'right', 'margin-right' => '4px'],]) ?>
+        <?= Html::button('回滚', ['class' => 'btn btn-success rollback-button', 'style' => ['float' => 'right', 'margin-right' => '4px'],'id' => 'rollback-button', 'data-target' => '#rollback-modal', 'data-toggle' => 'modal']) ?>
         <?php
+        //发布的弹窗
         Modal::begin([
             'id'          => 'publish-modal',
             'header'      => '<h4 class="modal-title">发布</h4>',
@@ -215,6 +216,17 @@ $this->registerJs($js);
             'size'        => 'modal-lg',
         ]);
         echo $this->render('publish_toggle');
+        Modal::end();
+
+        //回滚的弹窗
+        Modal::begin([
+            'id'          => 'rollback-modal',
+            'header'      => '<h4 class="modal-title">回滚</h4>',
+            'footer'      => '<a href="#" class="btn btn-primary" data-dismiss="modal">关闭</a>',
+            'bodyOptions' => ['class' => 'rollback'],
+            'size'        => 'modal-lg',
+        ]);
+        echo $this->render('rollback_toggle');
         Modal::end();
 
         ?>

@@ -9,10 +9,12 @@
 namespace app\controllers\api;
 
 use app\models\tables\ConfigDataModifyLog;
+use app\models\tables\ConfigDataReleaseHistory;
 use yii\web\Controller;
 use yii\web\Response;
 use app\models\FormatDataStruct;
 use app\models\Emum\ConfigDataModifyLogEmum;
+use app\models\Emum\ConfigDataReleaseHistoryEmum;
 
 
 class CommonConfigDataController extends Controller
@@ -28,5 +30,20 @@ class CommonConfigDataController extends Controller
             }
         });
         return FormatDataStruct::success($data);
+    }
+
+    public function actionGetConfigDataReleaseHistory()
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $configDataReleaseHistoryData = ConfigDataReleaseHistory::find()->select(['release_name'])->where('app_id=:app_id',[':app_id'=>\Yii::$app->session['app_id']])
+            ->andWhere('current_record_style=:current_record_style',[':current_record_style'=>ConfigDataReleaseHistoryEmum::$currentRecordStyleRelease])
+            ->orderBy(['id'=>SORT_DESC])
+            ->asArray()->all();
+
+        /**
+         * ,'current_record_style=:current_record_style'
+         * ,':current_record_style'=>ConfigDataReleaseHistoryEmum::$currentRecordStyleRelease
+         */
+        return FormatDataStruct::success($configDataReleaseHistoryData);
     }
 }

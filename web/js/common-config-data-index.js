@@ -107,16 +107,16 @@ $(function () {
     });
 });
 
+
 $(function () {
     $('.rollback-button').click(function () {
-        if(confirm('确认回滚？')){
-            $.ajax({
-                url: "/api/roll-back/roll-back",
+        $.ajax({
+                url: "/api/common-config-data/get-config-data-release-history",
                 type: "post",
                 // data:,
                 success: function (data) {
                     if (data.code==0){
-
+                        fullRollbackList(data['data']);
                     }else {
                         alert("获取项目信息失败 code 不等于0"+data.message);
                     }
@@ -125,6 +125,40 @@ $(function () {
                     alert("直接error了"+err['responseJSON']['message']);
                 }
             });
-        }
+    });
+});
+
+function fullRollbackList(data) {
+    var str='';
+   for (var i=0;i<data.length;i++){
+       str+= '<li><a href="#" >'+data[i]['release_name']+'</a></li>';
+   }
+   var selector=$('.common-config-data_index_rollback_dropdown-menu');
+    selector.empty();
+    selector.append(str);
+   return str;
+}
+
+$(function () {
+    $('.common-config-data_index_rollback_dropdown-menu').on('click','li',function () {
+        $(this).parent().parent().children().eq(0).text($(this).text());
+        $(this).parent().parent().children().eq(1).text($(this).text());
+    });
+    $('.index-toggle-rollback').click(function () {
+        $.ajax({
+            url: "/api/roll-back/roll-back",
+            type: "post",
+            data:{target_rollback_version:$(this).prev().children().eq(1).text()},
+            success: function (data) {
+                if (data.code==0){
+                    window.location='/common-config-data/index';
+                }else {
+                    alert("获取项目信息失败 code 不等于0"+data.message);
+                }
+            },
+            error: function (err) {
+                alert("直接error了"+err['responseJSON']['message']);
+            }
+        });
     });
 });
