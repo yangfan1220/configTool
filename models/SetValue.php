@@ -8,6 +8,7 @@
 
 namespace app\models;
 
+use app\models\tables\ProjectRedisInfo;
 
 class SetValue
 {
@@ -26,9 +27,9 @@ class SetValue
         return array_column($allProjectInfo, 'project_key', 'id');
     }
 
-    public static function getRedisInfoByProjectKey($projectKey)
+    public static function getRedisInfoByProjectKey($projectAppId)
     {
-        $redisInfo = ProjectInfo::find()->where(['project_key' => $projectKey])->asArray()->one();
+        $redisInfo = ProjectRedisInfo::find()->where(['project_app_id' => $projectAppId])->asArray()->one();
         /**
          *
          * $redisInfo =>>>>>>>>
@@ -74,7 +75,8 @@ class SetValue
         self::$redisConnection->hostname = $redisInfo['redis_host'];
         self::$redisConnection->port = $redisInfo['redis_port'];
         self::$redisConnection->database = $redisInfo['redis_database_id'];
-        self::$redisConnection->password = $redisInfo['redis_password'];
+
+        !empty($redisInfo['redis_password']) && self::$redisConnection->password = $redisInfo['redis_password'];
     }
 
     /**
@@ -87,16 +89,15 @@ class SetValue
         if ($testSetRe) {
             $testDelRe = self::$redisConnection->del('test');
             return $testDelRe ? true : false;
-        } else {
-            //TODO 日志、邮件、等等通知
-            return false;
         }
+        //TODO 日志、邮件、等等通知
+        return false;
     }
 
     public static function setRedisValue($data, $projectKey)
     {
         foreach ($data as $key => $value) {
-            $setRe = self::$redisConnection->set(static::getKeysRule($projectKey, $key), $value,'ex','3600');
+            $setRe = self::$redisConnection->set(static::getKeysRule($projectKey, $key), $value, 'ex', '3600');
             if ($setRe == false) {
                 //TODO 失败日志、邮件、等等通知
             }

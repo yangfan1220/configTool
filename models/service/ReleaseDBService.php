@@ -14,6 +14,9 @@ use app\models\tables\CommonConfigData;
 use app\models\tables\ConfigDataReleaseHistory;
 use app\models\tables\ConfigDataReleaseHistoryAllLog;
 use app\models\tables\ConfigDataReleaseHistoryModifyLog;
+use app\models\common\SetValueOfCommonModel;
+use app\models\SetValue;
+use yii\db\Exception;
 
 class ReleaseDBService
 {
@@ -70,5 +73,39 @@ class ReleaseDBService
             }
         }
 
+    }
+
+    public static function insertDataStorage($configDataAll)
+    {
+        $tableName=SetValueOfCommonModel::joinDataStorageTableName(\Yii::$app->session['app_id']);
+        SetValueOfCommonModel::TheTableExist($tableName);
+        $rows=[];
+        foreach ($configDataAll as $keysInfo) {
+            $rows[]=[
+                $keysInfo['key'],
+                $keysInfo['value'],
+            ];
+        }
+        return \Yii::$app->db2->createCommand()->batchInsert($tableName,['key','value'],$rows)->execute();
+    }
+
+    public static function saveToRedis($configDataAll)
+    {
+        $appId=\Yii::$app->session['app_id'];
+        //获取redis信息
+        $redisInfo=SetValue::getRedisInfoByProjectKey($appId);
+        SetValue::setConfDataRedisInfo($redisInfo);
+        //连接测试
+        $testConnectRe = SetValue::testConnect();
+        if ($testConnectRe==false) {
+            throw new Exception('redis失败');
+        }
+
+        foreach ($configDataAll as $keysInfo ) {
+            $setRe = SetValue::$redisConnection->set(SetValue::getKeysRule($appId, $keysInfo['key']), $keysInfo['value'], 'ex', '3600');
+            if ($setRe == false) {
+                throw new Exception('redis错误');
+            }
+        }
     }
 }

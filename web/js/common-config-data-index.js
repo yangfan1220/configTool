@@ -89,11 +89,13 @@ $(function () {
 
 $(function () {
     $('.index-toggle-release').click(function () {
+        $('.index-toggle-release').css('pointer-events','none').removeClass('btn-success').css('background-color','#4e555b');
         $.ajax({
             url: "/api/release/release",
             type: "post",
             data:{releaseName:$('.release-release-name').val(),releaseComment:$('.release-release-comment').val()},
             success: function (data) {
+                $('.index-toggle-release').css('pointer-events','auto').addClass('btn-success').css('background-color','');
                 if (data.code==0){
                     window.location.href='/common-config-data/index';
                 }else {
@@ -102,6 +104,7 @@ $(function () {
             },
             error: function (err) {
                 alert("直接error了"+err['responseJSON']['message']);
+                $('.index-toggle-release').css('pointer-events','auto').addClass('btn-success').css('background-color','');
             }
         });
     });

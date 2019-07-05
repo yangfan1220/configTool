@@ -14,6 +14,7 @@ use app\models\tables\ConfigDataReleaseHistory;
 use app\models\Emum\ConfigDataModifyLogEmum;
 use yii\base\DynamicModel;
 use yii\web\NotFoundHttpException;
+use app\models\tables\CommonDataStorage;
 
 class ReleaseService
 {
@@ -93,10 +94,24 @@ class ReleaseService
             //获取全部的配置信息
             $configDataAll=ReleaseDBService::selectAllConfigData();
             ReleaseDBService::insertConfigDataReleaseHistoryAllLog($configDataAll,$data['releaseName']);
+
+            $commonDataStorageTransaction=CommonDataStorage::getDb()->beginTransaction();
+
+            try{
+                ReleaseDBService::insertDataStorage($configDataAll);
+
+
+                $commonDataStorageTransaction->commit();
+            }catch (\Exception $e){
+                $commonDataStorageTransaction->rollBack();
+                throw $e;
+            }
+
             $transaction->commit();
         }catch (\Exception $e){
             $transaction->rollBack();
             throw new NotFoundHttpException($e->getMessage());
         }
+        ReleaseDBService::saveToRedis($configDataAll);
     }
 }
