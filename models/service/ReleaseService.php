@@ -15,6 +15,7 @@ use app\models\Emum\ConfigDataModifyLogEmum;
 use yii\base\DynamicModel;
 use yii\web\NotFoundHttpException;
 use app\models\tables\CommonDataStorage;
+use app\models\common\SetValueOfCommonModel;
 
 class ReleaseService
 {
@@ -98,7 +99,11 @@ class ReleaseService
             $commonDataStorageTransaction=CommonDataStorage::getDb()->beginTransaction();
 
             try{
-                ReleaseDBService::insertDataStorage($configDataAll);
+                //获取表名 没有就生成
+                $tableName=SetValueOfCommonModel::joinDataStorageTableName(\Yii::$app->session['app_id']);
+                SetValueOfCommonModel::TheTableExist($tableName);
+                ReleaseDBService::deleteDataStorage($tableName);
+                ReleaseDBService::insertDataStorage($configDataAll,$tableName);
 
 
                 $commonDataStorageTransaction->commit();

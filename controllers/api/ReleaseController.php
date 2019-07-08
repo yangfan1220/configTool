@@ -23,39 +23,22 @@ class ReleaseController extends Controller
         return FormatDataStruct::success($data);
     }
 
-    public function test()
+    public function actionTest()
     {
-        $rs = ['code' => 0, 'msg' => 'ok', 'data' => true];
-        ob_end_clean();
-//        ob_start();
-        echo json_encode($rs);
-        $size = ob_get_length();
-        header("Content-Length: $size");
-        header('Connection: close');
-        header("HTTP/1.1 200 OK");
-        header("Content-Type: application/json;charset=utf-8");
-        ob_flush();
-//        ob_end_flush();
-//        if(ob_get_length()){
-//
-//        }
-//
-//        flush();
-
-        ignore_user_abort(true);
-        set_time_limit(0);
-
-
-        $i = 0;
-        for ($a = 0; $a <= 9999999; $a++) {
-            $b = $a / 300;
-            if ($b == intval($b)) {
-                echo '<div>' . $i . '</div>';
-                flush();
-                $i++;
-            }
+        $messages = [];
+        $users = [
+            'fan.yang@mfashion.com.cn',
+        ];
+        $errorMessages=[
+            '当前app_id: '.\Yii::$app->session['app_id']
+        ];
+        foreach ($users as $user) {
+            $messages[] = \Yii::$app->mailer->compose('mailTemplate',['imageFileName'=>'./img/logo.png','errorMessages'=>$errorMessages])
+                ->setFrom(['alert@mfashion.com.cn' => '配置工具报警账号'])
+                ->setTo($user)
+                ->setSubject('配置工具发布至redis出现异常');
         }
-        echo 'ecd';
+        \Yii::$app->mailer->sendMultiple($messages);
     }
 
     /**
@@ -64,7 +47,7 @@ class ReleaseController extends Controller
     public function actionRelease()
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
-        $data=\Yii::$app->request->post();
+        $data = \Yii::$app->request->post();
         ReleaseService::releaseValidate($data);
         ReleaseService::Release($data);
         return FormatDataStruct::success();

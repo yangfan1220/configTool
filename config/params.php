@@ -12,7 +12,7 @@ return [
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='发布表';
 EOT,
-    'adminEmail' => 'admin@example.com',
-    'senderEmail' => 'noreply@example.com',
-    'senderName' => 'Example.com mailer',
+    'adminEmail' => 'fan.yang@mfashion.com.cn',
+//    'senderEmail' => 'alert@mfashion.com.cn',
+//    'senderName' => 'alert@mfashion.com.cn',
 ];

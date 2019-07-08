@@ -34,10 +34,20 @@ $config = [
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
-            // send all mails to a file by default. You have to set
-            // 'useFileTransport' to false and configure a transport
-            // for the mailer to send real emails.
-            'useFileTransport' => true,
+//            'viewPath' => '@common/mail',
+            'useFileTransport' => false,//false发送邮件，true只是生成邮件在runtime文件夹下，不发邮件
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.exmail.qq.com',
+                'username' => 'alert@mfashion.com.cn',
+                'password' => 'Rose123',
+                'port' => '465',
+                'encryption' => 'ssl',
+            ],
+//            'messageConfig'=>[
+//                'charset'=>'UTF-8',
+//                'from'=>['alert@mfashion.com.cn'=>'sad']
+//            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

@@ -13,9 +13,9 @@ use Yii;
 class SetValueOfCommonModel
 {
 
-    public static function joinDataStorageTableName($tableName)
+    public static function joinDataStorageTableName($appId)
     {
-        return $tableName.'_data_storage';
+        return $appId.'_data_storage';
     }
 
     public static function TheTableExist($tableName)

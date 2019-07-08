@@ -32,7 +32,7 @@ return [
 //        'port' => 6379,
 //        'database' => 0,
 //        'password'=>'foobared',
-//        'connectionTimeout'=>'3',
+        'connectionTimeout'=>'3',
         'dataTimeout'=>'3',
     ],
        ];

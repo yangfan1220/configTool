@@ -10,11 +10,12 @@ namespace app\models\service;
 
 
 use app\models\Emum\ConfigDataReleaseHistoryEmum;
+use app\models\Mail\MailMessageStruct;
+use app\models\Mail\SendMail;
 use app\models\tables\CommonConfigData;
 use app\models\tables\ConfigDataReleaseHistory;
 use app\models\tables\ConfigDataReleaseHistoryAllLog;
 use app\models\tables\ConfigDataReleaseHistoryModifyLog;
-use app\models\common\SetValueOfCommonModel;
 use app\models\SetValue;
 use yii\db\Exception;
 
@@ -75,10 +76,8 @@ class ReleaseDBService
 
     }
 
-    public static function insertDataStorage($configDataAll)
+    public static function insertDataStorage($configDataAll,$tableName)
     {
-        $tableName=SetValueOfCommonModel::joinDataStorageTableName(\Yii::$app->session['app_id']);
-        SetValueOfCommonModel::TheTableExist($tableName);
         $rows=[];
         foreach ($configDataAll as $keysInfo) {
             $rows[]=[
@@ -89,23 +88,34 @@ class ReleaseDBService
         return \Yii::$app->db2->createCommand()->batchInsert($tableName,['key','value'],$rows)->execute();
     }
 
+    public static function deleteDataStorage($tableName)
+    {
+        return \Yii::$app->db2->createCommand('DELETE FROM '.$tableName)->execute();
+    }
+
     public static function saveToRedis($configDataAll)
     {
-        $appId=\Yii::$app->session['app_id'];
-        //获取redis信息
-        $redisInfo=SetValue::getRedisInfoByProjectKey($appId);
-        SetValue::setConfDataRedisInfo($redisInfo);
-        //连接测试
-        $testConnectRe = SetValue::testConnect();
-        if ($testConnectRe==false) {
-            throw new Exception('redis失败');
-        }
-
-        foreach ($configDataAll as $keysInfo ) {
-            $setRe = SetValue::$redisConnection->set(SetValue::getKeysRule($appId, $keysInfo['key']), $keysInfo['value'], 'ex', '3600');
-            if ($setRe == false) {
-                throw new Exception('redis错误');
+        try{
+            $appId=\Yii::$app->session['app_id'];
+            //获取redis信息
+            $redisInfo=SetValue::getRedisInfoByProjectKey($appId);
+            SetValue::setConfDataRedisInfo($redisInfo);
+            //连接测试
+            $testConnectRe = SetValue::testConnect();
+            if ($testConnectRe==false) {
+                throw new Exception('SetValue::testConnect() 设置OR连接失败');
             }
+
+            foreach ($configDataAll as $keysInfo ) {
+                $setRe = SetValue::$redisConnection->set(SetValue::getKeysRule($appId, $keysInfo['key']), $keysInfo['value'], 'ex', '3600');
+                if ($setRe == false) {
+                    MailMessageStruct::pushMailMessage($keysInfo['key'].'的值'.$keysInfo['value'].'设置失败');
+                }
+            }
+        }catch (\Exception $e){
+            MailMessageStruct::unshiftMailMessage($e->getMessage());
+            MailMessageStruct::unshiftMailMessage('当前app_id: '.\Yii::$app->session['app_id']);
+            SendMail::send();
         }
     }
 }

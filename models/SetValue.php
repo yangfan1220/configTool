@@ -9,6 +9,10 @@
 namespace app\models;
 
 use app\models\tables\ProjectRedisInfo;
+use app\models\tables\ProjectInfo;
+use app\models\tables\CommonDataStorage;
+use app\models\Mail\MailMessageStruct;
+use app\models\Mail\SendMail;
 
 class SetValue
 {
@@ -24,44 +28,20 @@ class SetValue
     {
         $allProjectInfo = ProjectInfo::find()->asArray()->all();
         self::$currentProject = $allProjectInfo;
-        return array_column($allProjectInfo, 'project_key', 'id');
+        return array_column($allProjectInfo, 'app_id', 'id');
     }
 
     public static function getRedisInfoByProjectKey($projectAppId)
     {
         $redisInfo = ProjectRedisInfo::find()->where(['project_app_id' => $projectAppId])->asArray()->one();
-        /**
-         *
-         * $redisInfo =>>>>>>>>
-         * array(9) {
-         *'id' =>
-         *string(1) "4"
-         *'project_name' =>
-         *string(9) "测试一"
-         *'project_key' =>
-         *string(32) "b59c67bf196a4758191e42f76670ceba"
-         *'redis_host' =>
-         *string(9) "localhost"
-         *'redis_port' =>
-         *string(4) "6379"
-         *'redis_database_id' =>
-         *string(1) "0"
-         *'redis_password' =>
-         *string(8) "foobared"
-         *'create_time' =>
-         *string(19) "2019-05-17 15:35:42"
-         *'update_time' =>
-         *string(19) "2019-05-17 18:22:18"
-         * }
-         */
         //未来拆表的话，修改这里的获取redis信息逻辑
         return $redisInfo;
     }
 
     public static function getConfDataByProjectKey($projectKey)
     {
-        CommonConfigData::setTableName($projectKey);
-        $confData = CommonConfigData::find()->asArray()->all();
+        CommonDataStorage::setTableName($projectKey);
+        $confData = CommonDataStorage::find()->asArray()->all();
         return array_column($confData, 'value', 'key');
     }
 
@@ -90,18 +70,27 @@ class SetValue
             $testDelRe = self::$redisConnection->del('test');
             return $testDelRe ? true : false;
         }
-        //TODO 日志、邮件、等等通知
         return false;
     }
 
     public static function setRedisValue($data, $projectKey)
     {
         foreach ($data as $key => $value) {
-            $setRe = self::$redisConnection->set(static::getKeysRule($projectKey, $key), $value, 'ex', '3600');
-            if ($setRe == false) {
-                //TODO 失败日志、邮件、等等通知
+            try{
+                $setRe=self::$redisConnection->set(static::getKeysRule($projectKey, $key), $value, 'ex', '3600');
+                if ($setRe == false) {
+                    throw new \Exception('SetValue::setRedisValue() 推送数据到redis失败');
+                }
+            }catch (\Exception $e){
+                MailMessageStruct::unshiftMailMessage($e->getMessage());
+                MailMessageStruct::pushMailMessage('当前key为'.$key.'   '.'value为'.$value);
+                continue;
             }
-            //TODO 成功日志、邮件、等等通知
+        }
+
+        if(!empty(MailMessageStruct::$mailMessages)){
+            MailMessageStruct::unshiftMailMessage('当前app_id: '.\Yii::$app->session['app_id']);
+            SendMail::send();
         }
     }
 
