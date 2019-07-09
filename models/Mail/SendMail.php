@@ -19,7 +19,7 @@ class SendMail
             $users = [
                 \Yii::$app->params['adminEmail']
             ];
-            if (\Yii::$app->params['adminEmail'] != \Yii::$app->session['userMail']) {
+            if (\Yii::$app->params['adminEmail'] != \Yii::$app->session['userMail'] && !empty(\Yii::$app->session['userMail'])) {
                 array_push($users, \Yii::$app->session['userMail']);
             }
             foreach ($users as $user) {

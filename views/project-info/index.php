@@ -5,11 +5,6 @@
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->registerJs('$(function () {
-       var myProjectParentHeight=$(".myProject").parent().height();
-       if(myProjectParentHeight>400){
-           $(".myProject").css("height",myProjectParentHeight);
-       }
-       $(".myProjectChild").css("margin-top",myProjectParentHeight/2);
        //获取项目信息
        $.ajax({
         url: \'/api/project-info/get-project-info\',
@@ -22,6 +17,16 @@ $this->registerJs('$(function () {
                 }
                    
                 });
+                
+         var myProjectParentHeight=$(".myProject").parent().height();
+//       if(myProjectParentHeight>400){
+           $(".myProject").css("height",myProjectParentHeight);
+//       }
+       $(".myProjectChild").css("margin-top",myProjectParentHeight/2);
+    $(".createProject").click(function () {
+        window.location.href="/project-info/create";
+    });
+    
             }else {
                 alert("获取项目信息失败"+data.msg);
             }
@@ -29,9 +34,6 @@ $this->registerJs('$(function () {
         error: function (err) {
             alert("获取项目信息失败"+data.msg);
         }
-    });
-    $(".createProject").click(function () {
-        window.location.href="/project-info/create";
     });
        });');
 $this->registerJs('

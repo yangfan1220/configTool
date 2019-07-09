@@ -371,7 +371,6 @@ class Command extends Component
                 $this->params[$name] = $value;
             }
         }
-
         return $this;
     }
 

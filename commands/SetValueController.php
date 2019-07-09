@@ -22,8 +22,13 @@ class SetValueController extends Controller
     {
         //获取所有的项目信息的key
         $AllProject = SetValue::getAllProject();
-        var_dump($AllProject);
-        foreach ($AllProject as $projectKey) {
+        foreach ($AllProject as $projectKey=>$releaseStatus) {
+            if ($releaseStatus!=2){
+                continue;
+            }
+//            if(SetValue::theTableIsExist($projectKey)===false){
+//                continue;
+//            }
             //获取当前项目的redis信息
             $redisInfo = SetValue::getRedisInfoByProjectKey($projectKey);
             //设置当前项目的redis信息
@@ -47,12 +52,6 @@ class SetValueController extends Controller
 
             SetValue::setRedisValue($ConfData,$projectKey);
         }
-        echo 1111;
         return ExitCode::OK;
-    }
-
-    private function sendMail()
-    {
-
     }
 }

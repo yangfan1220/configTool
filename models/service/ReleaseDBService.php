@@ -17,15 +17,16 @@ use app\models\tables\ConfigDataReleaseHistory;
 use app\models\tables\ConfigDataReleaseHistoryAllLog;
 use app\models\tables\ConfigDataReleaseHistoryModifyLog;
 use app\models\SetValue;
+use app\models\tables\ProjectInfo;
 use yii\db\Exception;
 
 class ReleaseDBService
 {
-    public static function insertConfigDataReleaseHistory($data)
+    public static function insertConfigDataReleaseHistory($data,$currentRecordStyle=0)
     {
         $model = new  ConfigDataReleaseHistory();
         $model->app_id = \Yii::$app->session['app_id'];
-        $model->current_record_style = ConfigDataReleaseHistoryEmum::$currentRecordStyleRelease;
+        $model->current_record_style = empty($currentRecordStyle)?ConfigDataReleaseHistoryEmum::$currentRecordStyleRelease:$currentRecordStyle;
         $model->release_name = $data['releaseName'];
         $model->comment = $data['releaseComment'];
         $model->create_name = \Yii::$app->session['userMail'];
@@ -55,7 +56,7 @@ class ReleaseDBService
 
     public static function selectAllConfigData()
     {
-        $sql='select `key`,`value` from '.CommonConfigData::tableName().' where app_id=:app_id for update ';
+        $sql='select * from '.CommonConfigData::tableName().' where app_id=:app_id for update ';
         $configDataAll=CommonConfigData::getDb()->createCommand($sql,[':app_id'=>\Yii::$app->session['app_id']])->queryAll();
         return $configDataAll;
     }
@@ -68,12 +69,30 @@ class ReleaseDBService
             $model->release_name=$releaseName;
             $model->key=$keysInfo['key'];
             $model->value=$keysInfo['value'];
+            $model->config_level_log=$keysInfo['config_level'];
+            $model->comment_log=$keysInfo['comment'];
+            $model->value_type_log=$keysInfo['value_type'];
+            $model->create_name_log=$keysInfo['create_name'];
+            $model->modify_name_log=$keysInfo['modify_name'];
+            $model->create_time_log=$keysInfo['create_time'];
+            $model->update_time_log=$keysInfo['update_time'];
             $model->save();
             if($model->hasErrors()){
                 throw new \Exception(current($model->getFirstErrors()));
             }
         }
 
+    }
+
+    public static function updateProjectInfo()
+    {
+        $projectInfoObj=ProjectInfo::findOne(['app_id'=>\Yii::$app->session['app_id']]);
+        $projectInfoObj->release_status=2;
+        $projectInfoObj->will_rollback_release_name='';
+        $projectInfoObj->save();
+        if($projectInfoObj->hasErrors()){
+            throw new \Exception(current($projectInfoObj->getFirstErrors()));
+        }
     }
 
     public static function insertDataStorage($configDataAll,$tableName)

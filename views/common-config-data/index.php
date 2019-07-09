@@ -19,9 +19,6 @@ $currentKeyStatus=ReleaseService::getReleaseChanges();
 $dataProviderValueType2->pagination->pageParam = 'data2-page';
 $dataProviderValueType2->sort->sortParam = 'data2-sort';
 
-//$dataProviderValueType1->pagination->pageParam = 'data1-page';
-//$dataProviderValueType1->sort->sortParam = 'data1-sort';
-
 $this->registerJs('$(function () {
         $.ajax({
             url: "/api/project-info/get-project-over-view-info",
