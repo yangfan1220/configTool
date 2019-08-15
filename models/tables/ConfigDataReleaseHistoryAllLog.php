@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "config_data_release_history_all_log".
  *
  * @property int $id
+ * @property string $unique_id 当前版本的唯一id
  * @property string $app_id 项目(应用)唯一key
  * @property string $release_name 发布名称
  * @property string $key 配置名称
@@ -36,14 +37,14 @@ class ConfigDataReleaseHistoryAllLog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['app_id', 'release_name', 'key', 'value', 'config_level_log', 'comment_log', 'value_type_log', 'create_time_log', 'update_time_log'], 'required'],
+            [['unique_id', 'app_id', 'release_name', 'key', 'value', 'config_level_log', 'comment_log', 'value_type_log', 'create_time_log', 'update_time_log'], 'required'],
             [['value'], 'string'],
             [['config_level_log', 'value_type_log'], 'integer'],
             [['create_time_log', 'update_time_log'], 'safe'],
+            [['unique_id', 'release_name', 'key'], 'string', 'max' => 128],
             [['app_id', 'create_name_log', 'modify_name_log'], 'string', 'max' => 50],
-            [['release_name', 'key'], 'string', 'max' => 128],
             [['comment_log'], 'string', 'max' => 512],
-            [['app_id', 'release_name', 'key'], 'unique', 'targetAttribute' => ['app_id', 'release_name', 'key']],
+            [['unique_id', 'key'], 'unique', 'targetAttribute' => ['unique_id', 'key']],
         ];
     }
 
@@ -54,6 +55,7 @@ class ConfigDataReleaseHistoryAllLog extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'unique_id' => '当前版本的唯一id',
             'app_id' => '项目(应用)唯一key',
             'release_name' => '发布名称',
             'key' => '配置名称',

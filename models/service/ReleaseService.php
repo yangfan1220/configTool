@@ -9,31 +9,46 @@
 namespace app\models\service;
 
 
+use app\models\Helper;
 use app\models\tables\CommonConfigData;
 use app\models\tables\ConfigDataReleaseHistory;
 use app\models\Emum\ConfigDataModifyLogEmum;
-use app\models\tables\ProjectInfo;
 use yii\base\DynamicModel;
 use yii\web\NotFoundHttpException;
 use app\models\tables\CommonDataStorage;
 use app\models\common\SetValueOfCommonModel;
-use app\models\Emum\ConfigDataReleaseHistoryEmum;
 
 class ReleaseService
 {
-    private static function getCurrentBaseConfigDataByAppId($appId)
+    private static function getModifyName($compareType, $data)
     {
-        return CommonConfigData::find()->select(['key', 'value', 'create_name', 'modify_name', 'update_time'])->where(['app_id' => $appId])->asArray()->all();
+        if ($compareType == 1) {
+            $modifyName = !empty($data['modify_name']) ? $data['modify_name'] : $data['create_name'];
+        } elseif ($compareType == 2) {
+            $modifyName = !empty($data['modify_name_log']) ? $data['modify_name_log'] : $data['create_name_log'];
+        } else {
+            throw new NotFoundHttpException('参数错误');
+        }
+        return $modifyName;
     }
 
-    private static function getCurrentAlreadyReleaseConfigDataByAppId($appId)
+    private static function getCurrentBaseConfigDataByAppId($appId)
     {
-        $data = ConfigDataReleaseHistory::findBySql('SELECT * FROM `config_data_release_history_all_log` WHERE `app_id`=:app_id AND `release_name`=(SELECT `release_name` FROM `config_data_release_history` WHERE `app_id`=:app_id ORDER BY `id`
- DESC LIMIT 1)', [':app_id' => $appId])->asArray()->all();
+        $sql = 'SELECT `key`, `value`, `create_name`, `modify_name`, `update_time` FROM ' . CommonConfigData::tableName() . ' where `app_id`=:app_id for update';
+        return CommonConfigData::findBySql($sql, [':app_id' => $appId])->asArray()->all();
+    }
+
+    public static function getCurrentAlreadyReleaseConfigDataByAppId($appId)
+    {
+        $sql = 'SELECT b.* FROM project_info a
+        LEFT JOIN  config_data_release_history_all_log b
+        ON a.current_released_unique_id=b.unique_id
+        WHERE a.app_id=:app_id FOR UPDATE';
+        $data = ConfigDataReleaseHistory::findBySql($sql, [':app_id' => $appId])->asArray()->all();
         return array_column($data, null, 'key');
     }
 
-    private static function compare($baseArr, $alreadyArr)
+    public static function compare($baseArr, $alreadyArr, $compareType = 1)
     {
         $compareResultArr = [];
         foreach ($baseArr as $val) {
@@ -46,8 +61,8 @@ class ReleaseService
                     $compareResultArr[$val['key']]['status'] = ConfigDataModifyLogEmum::$modifyTypeModify;
                     $compareResultArr[$val['key']]['alreadyRelease'] = $alreadyArr[$val['key']]['value'];
                     $compareResultArr[$val['key']]['notRelease'] = $val['value'];
-                    $compareResultArr[$val['key']]['modifyName'] = !empty($val['modify_name']) ? $val['modify_name'] : $val['create_name'];
-                    $compareResultArr[$val['key']]['updateTime'] = $val['update_time'];
+                    $compareResultArr[$val['key']]['modifyName'] = static::getModifyName($compareType, $val);
+                    $compareResultArr[$val['key']]['updateTime'] = $compareType == 1 ? $val['update_time'] : $val['update_time_log'];
                     unset($alreadyArr[$val['key']]);
                 }
             } else {
@@ -55,12 +70,13 @@ class ReleaseService
                 $compareResultArr[$val['key']]['status'] = ConfigDataModifyLogEmum::$modifyTypeAdd;
                 $compareResultArr[$val['key']]['alreadyRelease'] = '';
                 $compareResultArr[$val['key']]['notRelease'] = $val['value'];
-                $compareResultArr[$val['key']]['modifyName'] = !empty($val['modify_name']) ? $val['modify_name'] : $val['create_name'];
-                $compareResultArr[$val['key']]['updateTime'] = $val['update_time'];
+                $compareResultArr[$val['key']]['modifyName'] = static::getModifyName($compareType, $val);
+                $compareResultArr[$val['key']]['updateTime'] = $compareType == 1 ? $val['update_time'] : $val['update_time_log'];
             }
         }
 
-        foreach ($alreadyArr as $k=>$v){
+        //两者unset后剩下的就是删除的
+        foreach ($alreadyArr as $k => $v) {
             $compareResultArr[$k]['status'] = ConfigDataModifyLogEmum::$modifyTypeDel;
             $compareResultArr[$k]['alreadyRelease'] = $v['value'];
             $compareResultArr[$k]['notRelease'] = '';
@@ -68,10 +84,6 @@ class ReleaseService
             $compareResultArr[$k]['updateTime'] = $v['update_time_log'];
         }
 
-        //组装将要删除的键名  暂时没有   设计
-//        $displayDeleteKeys = array_keys($alreadyArr);
-//        $value = array_fill(0, count($displayDeleteKeys), ConfigDataModifyLogEmum::$modifyTypeDel);
-//        $willDel=array_combine($displayDeleteKeys, $value);
         return $compareResultArr;
     }
 
@@ -99,60 +111,20 @@ class ReleaseService
      */
     public static function Release($data)
     {
-        $projectInfoObj = ProjectInfo::findOne(['app_id' => \Yii::$app->session['app_id']]);
-        if ($projectInfoObj->release_status == 1) {
-            $configDataAll = static::releaseForRollBack($projectInfoObj->will_rollback_release_name);
-        } else {
-            $modifyDataLog = static::getReleaseChanges();
-            $transaction = ConfigDataReleaseHistory::getDb()->beginTransaction();
-            try {
-                ReleaseDBService::insertConfigDataReleaseHistory($data);
-                ReleaseDBService::insertConfigDataReleaseHistoryModifyLog($modifyDataLog, $data['releaseName']);
-                //获取全部的配置信息
-                $configDataAll = ReleaseDBService::selectAllConfigData();
-                ReleaseDBService::insertConfigDataReleaseHistoryAllLog($configDataAll, $data['releaseName']);
-                ReleaseDBService::updateProjectInfo();
-
-                $commonDataStorageTransaction = CommonDataStorage::getDb()->beginTransaction();
-
-                try {
-                    //获取表名 没有就生成
-                    $tableName = SetValueOfCommonModel::joinDataStorageTableName(\Yii::$app->session['app_id']);
-                    SetValueOfCommonModel::TheTableExist($tableName);
-                    ReleaseDBService::deleteDataStorage($tableName);
-                    ReleaseDBService::insertDataStorage($configDataAll, $tableName);
-
-
-                    $commonDataStorageTransaction->commit();
-                } catch (\Exception $e) {
-                    $commonDataStorageTransaction->rollBack();
-                    throw $e;
-                }
-                $transaction->commit();
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                $message = $e->getMessage() . "\n" . $e->getFile() . "\n" . $e->getLine();
-                throw new NotFoundHttpException($message);
-            }
-        }
-        ReleaseDBService::saveToRedis($configDataAll);
-    }
-
-    private static function releaseForNormal()
-    {
-
-    }
-
-    private static function releaseForRollBack($willRollbackReleaseName)
-    {
         $transaction = ConfigDataReleaseHistory::getDb()->beginTransaction();
+        $modifyDataLog = static::getReleaseChanges();//获取当前的与已经发布的配置的变化
         try {
-            ReleaseDBService::insertConfigDataReleaseHistory(['releaseName' => $willRollbackReleaseName, 'releaseComment' => '回滚'], ConfigDataReleaseHistoryEmum::$currentRecordStyleRollback);
+            $uniqueId = Helper::getCode();
+            ReleaseDBService::updateProjectInfo($uniqueId); //更新当前的发布版本
+            ReleaseDBService::insertConfigDataReleaseHistory($data, $uniqueId);//插入发布的历史记录
+            ReleaseDBService::insertConfigDataReleaseHistoryModifyLog($modifyDataLog, $data['releaseName'], $uniqueId);//发布的历史记录数据的修改记录(与已经发布的配置的变化)
+            //获取全部的配置信息
             $configDataAll = ReleaseDBService::selectAllConfigData();
-            ReleaseDBService::updateProjectInfo();
+            ReleaseDBService::insertConfigDataReleaseHistoryAllLog($configDataAll, $data['releaseName'], $uniqueId);
 
-            /***嵌套事务开启***/
+
             $commonDataStorageTransaction = CommonDataStorage::getDb()->beginTransaction();
+
             try {
                 //获取表名 没有就生成
                 $tableName = SetValueOfCommonModel::joinDataStorageTableName(\Yii::$app->session['app_id']);
@@ -160,18 +132,18 @@ class ReleaseService
                 ReleaseDBService::deleteDataStorage($tableName);
                 ReleaseDBService::insertDataStorage($configDataAll, $tableName);
 
+
                 $commonDataStorageTransaction->commit();
             } catch (\Exception $e) {
                 $commonDataStorageTransaction->rollBack();
                 throw $e;
             }
-
             $transaction->commit();
         } catch (\Exception $e) {
             $transaction->rollBack();
             $message = $e->getMessage() . "\n" . $e->getFile() . "\n" . $e->getLine();
             throw new NotFoundHttpException($message);
         }
-        return $configDataAll;
+        ReleaseDBService::saveToRedis($configDataAll);
     }
 }

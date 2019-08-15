@@ -134,7 +134,7 @@ $(function () {
 function fullRollbackList(data) {
     var str='';
    for (var i=0;i<data.length;i++){
-       str+= '<li><a href="#" >'+data[i]['release_name']+'</a></li>';
+       str+= '<li><a href="#" uniqueId="'+data[i]['unique_id']+'">'+data[i]['release_name']+'</a></li>';
    }
    var selector=$('.common-config-data_index_rollback_dropdown-menu');
     selector.empty();
@@ -145,13 +145,14 @@ function fullRollbackList(data) {
 $(function () {
     $('.common-config-data_index_rollback_dropdown-menu').on('click','li',function () {
         $(this).parent().parent().children().eq(0).text($(this).text());
-        $(this).parent().parent().children().eq(1).text($(this).text());
+        var tmp =$(this).children('a').attr('uniqueid');
+        $(this).parent().parent().children().eq(1).text(tmp);
     });
     $('.index-toggle-rollback').click(function () {
         $.ajax({
             url: "/api/roll-back/roll-back",
             type: "post",
-            data:{target_rollback_version:$(this).prev().children().eq(1).text()},
+            data:{target_rollback_version_uniqueId:$(this).prev().children().eq(1).text(),target_rollback_version_release_name:$(this).prev().children().eq(0).text()},
             success: function (data) {
                 if (data.code==0){
                     window.location='/common-config-data/index';

@@ -21,9 +21,12 @@ $(function () {
         //填充值
         $('.version').empty();
         $('.datetime').empty();
+        $('.uniqueId').empty();
         var version=$(this).attr('version');
+        var uniqueId=$(this).attr('uniqueId');
         var create_time=$(this).attr('create_time');
         $('.version').append(version);
+        $('.uniqueId').append(uniqueId);
         $('.datetime').append(create_time);
         $(this).attr('click','true');
         $(this).css('background-color','#9a9595');
@@ -49,7 +52,7 @@ function generateReleaseHistoryList(data) {
 
     for (let k in data) {
         var  time=formatDate(data[k]["create_time"]);
-        str+='<div class="ReleaseHistory" style="border-right: #0f0f0f 4px ridge;height: 50px;cursor:pointer;" version='+data[k]["release_name"]+' create_time="'+[data[k]["create_time"]]+'"> <div style="padding-top: 5%"><div style="display: inline">'+data[k]["create_name"]+'</div><div id="releaseStatus">'+releaseStatus[data[k]["current_record_style"]]+'</div><div id="releaseDate">'+time+'</div></div></div> ';
+        str+='<div class="ReleaseHistory" style="border-right: #0f0f0f 4px ridge;height: 50px;cursor:pointer;" version='+data[k]["release_name"]+' uniqueId='+ data[k]["unique_id"]+' create_time="'+[data[k]["create_time"]]+'"> <div style="padding-top: 5%"><div style="display: inline">'+data[k]["create_name"]+'</div><div id="releaseStatus">'+releaseStatus[data[k]["current_record_style"]]+'</div><div id="releaseDate">'+time+'</div></div></div> ';
     }
     return str;
 }
@@ -93,9 +96,14 @@ function getConfig(configType) {
     $.ajax({
         url: "/api/release-history/get-release-history-config",
         type: "get",
-        data:{releaseName:$('.version').text(),configType:configType},
+        data:{
+            releaseName:$('.version').text(),
+            configType:configType,
+            uniqueId:$('.uniqueId').text(),
+        },
         success: function (data) {
             if (data.code==0){
+                $('.tableContainer').empty();
                 var  str='';
                 if(configType==1){
                     str=generateModifyConfigForModifyConfig(data.data);

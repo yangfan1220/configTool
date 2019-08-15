@@ -27,6 +27,7 @@
         <div style="height: 50px;background-color:  #e6e6e6;">
             <div style="padding-top: 2%">
             <div style="display: inline" class="version"></div>
+            <div style="display: none" class="uniqueId"></div>
             <div style="display: inline;float: right" class="datetime"></div>
             </div>
         </div>

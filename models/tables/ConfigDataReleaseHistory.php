@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "config_data_release_history".
  *
  * @property int $id
+ * @property string $unique_id 当前版本的唯一id
  * @property string $app_id 项目(应用)唯一key
  * @property int $current_record_style 当前发布记录的方式:1:普通发布；2：回滚
  * @property string $release_name 发布名称
@@ -31,12 +32,13 @@ class ConfigDataReleaseHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['app_id', 'current_record_style', 'release_name', 'create_name'], 'required'],
+            [['unique_id', 'app_id', 'current_record_style', 'release_name', 'create_name'], 'required'],
             [['current_record_style'], 'integer'],
             [['create_time'], 'safe'],
+            [['unique_id', 'release_name'], 'string', 'max' => 128],
             [['app_id', 'create_name'], 'string', 'max' => 50],
-            [['release_name'], 'string', 'max' => 128],
             [['comment'], 'string', 'max' => 512],
+            [['unique_id'], 'unique'],
         ];
     }
 
@@ -47,6 +49,7 @@ class ConfigDataReleaseHistory extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'unique_id' => '当前版本的唯一id',
             'app_id' => '项目(应用)唯一key',
             'current_record_style' => '当前发布记录的方式:1:普通发布；2：回滚',
             'release_name' => '发布名称',

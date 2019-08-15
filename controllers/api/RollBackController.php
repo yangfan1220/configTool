@@ -20,11 +20,12 @@ class RollBackController extends  Controller
     public function actionRollBack()
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
-        $targetRollbackVersion=\Yii::$app->request->post('target_rollback_version');
-        if(empty($targetRollbackVersion)){
-            throw new NotFoundHttpException('target_rollback_version不能为空');
+        $targetRollbackVersionUniqueId=\Yii::$app->request->post('target_rollback_version_uniqueId');
+        $targetRollbackVersionReleaseName=\Yii::$app->request->post('target_rollback_version_release_name');
+        if(empty($targetRollbackVersionUniqueId)){
+            throw new NotFoundHttpException('target_rollback_version_uniqueId不能为空');
         }
-        RollBackService::RollBack($targetRollbackVersion);
+        RollBackService::RollBack($targetRollbackVersionUniqueId,$targetRollbackVersionReleaseName);
         return FormatDataStruct::success();
     }
 }

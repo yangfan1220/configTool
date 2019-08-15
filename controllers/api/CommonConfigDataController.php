@@ -35,7 +35,7 @@ class CommonConfigDataController extends Controller
     public function actionGetConfigDataReleaseHistory()
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
-        $configDataReleaseHistoryData = ConfigDataReleaseHistory::find()->select(['release_name'])->where('app_id=:app_id',[':app_id'=>\Yii::$app->session['app_id']])
+        $configDataReleaseHistoryData = ConfigDataReleaseHistory::find()->select(['release_name','unique_id'])->where('app_id=:app_id',[':app_id'=>\Yii::$app->session['app_id']])
             ->andWhere('current_record_style=:current_record_style',[':current_record_style'=>ConfigDataReleaseHistoryEmum::$currentRecordStyleRelease])
             ->orderBy(['id'=>SORT_DESC])
             ->asArray()->all();
